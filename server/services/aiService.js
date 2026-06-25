@@ -1,7 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 
-const getMockSuggestion = (title) => {
-  // Deterministic mock based on title length
+const getMockSuggestion = (title, reason = 'AI unavailable') => {
   const len = title.length;
   let effort, hours;
   if (len < 20) { effort = 'S'; hours = 2; }
@@ -15,22 +14,31 @@ const getMockSuggestion = (title) => {
     effort,
     estimatedHours: hours,
     suggestedDueDate: dueDate.toISOString().split('T')[0],
-    reasoning: `Mock estimate: Based on task complexity, this appears to be a ${effort}-sized task (~${hours} hours). AI is unavailable — using fallback estimation.`,
+    reasoning: `Fallback estimate (${reason}): Based on task length, this is a ${effort}-sized task (~${hours} hours).`,
     isMock: true
   };
 };
 
+const MODELS_TO_TRY = [
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
+  'gemini-1.5-flash-8b',
+];
+
+const tryGenerateWithModel = async (ai, model, prompt) => {
+  const response = await ai.models.generateContent({ model, contents: prompt });
+  return response.text.trim();
+};
+
 export const getAISuggestion = async (title, description) => {
-  // If no API key, return mock
   if (!process.env.GEMINI_API_KEY) {
-    return getMockSuggestion(title);
+    return getMockSuggestion(title, 'no API key configured');
   }
 
-  try {
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-    const today = new Date().toISOString().split('T')[0];
-    const prompt = `You are a project management assistant. Given the following task, estimate the effort required.
+  const today = new Date().toISOString().split('T')[0];
+  const prompt = `You are a project management assistant. Given the following task, estimate the effort required.
 
 Task Title: ${title}
 Task Description: ${description || 'No description provided'}
@@ -44,38 +52,55 @@ Respond ONLY with valid JSON (no markdown, no code fences, no extra text):
   "reasoning": "<1-2 sentence explanation>"
 }`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt
-    });
+  let lastError = null;
 
-    const text = response.text.trim();
-    
-    // Try to parse the JSON response
-    let parsed;
+  for (const model of MODELS_TO_TRY) {
     try {
-      // Remove potential code fences if the model adds them
+      console.log(`🤖 Trying AI model: ${model}`);
+      const text = await tryGenerateWithModel(ai, model, prompt);
+
+      // Parse JSON response
       const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsed = JSON.parse(cleanText);
-    } catch {
-      console.error('Failed to parse AI response:', text);
-      return getMockSuggestion(title);
-    }
+      let parsed;
+      try {
+        parsed = JSON.parse(cleanText);
+      } catch {
+        console.error(`Failed to parse AI response from ${model}:`, text);
+        continue; // Try next model
+      }
 
-    // Validate the response structure
-    const validEfforts = ['S', 'M', 'L'];
-    if (!validEfforts.includes(parsed.effort)) parsed.effort = 'M';
-    if (typeof parsed.estimatedHours !== 'number' || parsed.estimatedHours < 1) parsed.estimatedHours = 4;
-    if (!parsed.suggestedDueDate || isNaN(Date.parse(parsed.suggestedDueDate))) {
-      const fallbackDate = new Date();
-      fallbackDate.setDate(fallbackDate.getDate() + 3);
-      parsed.suggestedDueDate = fallbackDate.toISOString().split('T')[0];
-    }
-    if (!parsed.reasoning) parsed.reasoning = 'AI-generated estimate based on task analysis.';
+      // Validate and sanitize
+      const validEfforts = ['S', 'M', 'L'];
+      if (!validEfforts.includes(parsed.effort)) parsed.effort = 'M';
+      if (typeof parsed.estimatedHours !== 'number' || parsed.estimatedHours < 1) parsed.estimatedHours = 4;
+      if (!parsed.suggestedDueDate || isNaN(Date.parse(parsed.suggestedDueDate))) {
+        const fallback = new Date();
+        fallback.setDate(fallback.getDate() + 3);
+        parsed.suggestedDueDate = fallback.toISOString().split('T')[0];
+      }
+      if (!parsed.reasoning) parsed.reasoning = 'AI-generated estimate based on task analysis.';
 
-    return { ...parsed, isMock: false };
-  } catch (error) {
-    console.error('AI service error:', error.message);
-    return getMockSuggestion(title);
+      console.log(`✅ AI suggestion from model: ${model}`);
+      return { ...parsed, isMock: false, model };
+
+    } catch (err) {
+      lastError = err;
+      const status = err.status || err.code;
+      if (status === 429) {
+        console.warn(`⚠️ Quota exceeded for ${model}, trying next model...`);
+        continue; // Try next model
+      }
+      // For other errors, log and try next
+      console.error(`❌ Error with ${model}:`, err.message);
+      continue;
+    }
   }
+
+  // All models failed
+  const reason = lastError?.status === 429
+    ? 'API quota exceeded — please check your Gemini API key at aistudio.google.com'
+    : lastError?.message || 'AI service unavailable';
+
+  console.error('❌ All AI models failed:', reason);
+  return getMockSuggestion(title, reason);
 };

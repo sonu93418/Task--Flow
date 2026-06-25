@@ -26,8 +26,8 @@
   /* ─ Semantic Colors ─ */
   --primary: var(--indigo);
   --primary-hover: var(--indigo-light);
-  --accent: var(--sakura);
-  --accent-hover: var(--sakura-deep);
+  --accent: var(--indigo-light);        /* changed from sakura to indigo */
+  --accent-hover: var(--indigo);
   --success: var(--matcha);
   --success-light: var(--matcha-light);
   --warning: var(--kitsune);
@@ -66,7 +66,7 @@
 
   --border: hsla(225, 15%, 25%, 0.5);
   --border-light: hsla(225, 15%, 25%, 0.25);
-  --border-focus: var(--sakura);
+  --border-focus: var(--indigo-light);  /* indigo focus ring, not pink */
 
   --scrollbar-bg: hsl(225, 18%, 11%);
   --scrollbar-thumb: hsl(225, 15%, 25%);
@@ -111,8 +111,8 @@
   --shadow-md: 0 4px 12px hsla(0, 0%, 0%, 0.2), 0 2px 4px hsla(0, 0%, 0%, 0.12);
   --shadow-lg: 0 8px 28px hsla(0, 0%, 0%, 0.3), 0 4px 8px hsla(0, 0%, 0%, 0.15);
   --shadow-xl: 0 16px 48px hsla(0, 0%, 0%, 0.35);
-  --shadow-glow: 0 0 20px hsla(340, 65%, 75%, 0.15);
-  --shadow-sakura: 0 4px 20px hsla(340, 65%, 75%, 0.2);
+  --shadow-glow: 0 0 20px hsla(235, 45%, 55%, 0.2);   /* indigo glow */
+  --shadow-sakura: 0 4px 20px hsla(235, 45%, 55%, 0.25); /* repurposed to indigo */
 
   /* ─ Transitions ─ */
   --transition-fast: 150ms ease;

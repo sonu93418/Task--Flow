@@ -5,29 +5,35 @@ import { ToastProvider } from './components/UI/Toast';
 import { useAuth } from './hooks/useAuth';
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
+import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import BoardView from './pages/BoardView';
 import NotFound from './pages/NotFound';
 
+// Redirect authenticated users away from public pages
 function AuthRedirect({ children }) {
   const { user, loading } = useAuth();
   if (loading) return null;
-  if (user) return <Navigate to="/" replace />;
+  if (user) return <Navigate to="/dashboard" replace />;
   return children;
 }
 
 function AppRoutes() {
   return (
     <Routes>
-      {/* Public routes */}
+      {/* Landing page — public */}
+      <Route path="/landing" element={<Landing />} />
+
+      {/* Auth routes — redirect to dashboard if already logged in */}
       <Route path="/login" element={<AuthRedirect><Login /></AuthRedirect>} />
       <Route path="/register" element={<AuthRedirect><Register /></AuthRedirect>} />
 
-      {/* Protected routes */}
+      {/* Protected app routes */}
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/board/:id" element={<BoardView />} />
       </Route>
 

@@ -13,10 +13,23 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  origin: (origin, callback) => {
+    // Allow any localhost origin in development
+    if (!origin || origin.startsWith('http://localhost')) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '1mb' }));
+
+// Request logger
+app.use((req, _res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`, req.body && Object.keys(req.body).length ? JSON.stringify(req.body) : '');
+  next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -40,8 +53,19 @@ app.use(errorHandler);
 // Start server
 const start = async () => {
   await connectDB();
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`🌸 TaskFlow server running on port ${PORT}`);
+    console.log(`📡 API Base: http://localhost:${PORT}/api`);
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`❌ Port ${PORT} is already in use.`);
+      console.error(`   Run this to fix: netstat -ano | findstr :${PORT}  then  Stop-Process -Id <PID> -Force`);
+      process.exit(1);
+    } else {
+      throw err;
+    }
   });
 };
 

@@ -57,8 +57,10 @@ export default function TaskModal({ isOpen, onClose, onSubmit, onDelete, task, m
     try {
       const res = await suggestEstimate({ title, description });
       setAiSuggestion(res.data.data);
-    } catch {
-      setAiSuggestion({ error: true });
+    } catch (err) {
+      const status = err.response?.status;
+      const msg = err.response?.data?.message || 'Failed to get AI suggestion.';
+      setAiSuggestion({ error: true, status, msg });
     } finally {
       setAiLoading(false);
     }
@@ -166,9 +168,16 @@ export default function TaskModal({ isOpen, onClose, onSubmit, onDelete, task, m
           )}
 
           {aiSuggestion?.error && (
-            <p style={{ color: 'var(--danger)', fontSize: 'var(--font-size-sm)', marginTop: 'var(--space-3)' }}>
-              Failed to get AI suggestion. Please try again.
-            </p>
+            <div style={{ marginTop: 'var(--space-3)', padding: 'var(--space-3)', background: 'rgba(var(--danger-rgb, 180,40,40),0.08)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(var(--danger-rgb, 180,40,40),0.2)' }}>
+              <p style={{ color: 'var(--danger)', fontSize: 'var(--font-size-sm)', margin: 0 }}>
+                ⚠️ {aiSuggestion.msg || 'Failed to get AI suggestion.'}
+              </p>
+              {aiSuggestion.msg?.includes('quota') && (
+                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-xs)', margin: 'var(--space-1) 0 0' }}>
+                  Get a fresh key at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" style={{color:'var(--accent)'}}>aistudio.google.com</a>
+                </p>
+              )}
+            </div>
           )}
         </div>
 

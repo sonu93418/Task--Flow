@@ -1,7 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useOutletContext, useNavigate } from 'react-router-dom';
-import { IoAdd, IoTrashOutline, IoCreateOutline, IoCalendarOutline, IoLayersOutline } from 'react-icons/io5';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import {
+  IoAdd, IoTrashOutline, IoCreateOutline, IoCalendarOutline,
+  IoLayersOutline, IoCheckmarkDone, IoTimeOutline, IoWarning, IoList
+} from 'react-icons/io5';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/UI/Toast';
 import { deleteBoard as deleteBoardApi, updateBoard as updateBoardApi } from '../api/boards';
@@ -56,19 +59,19 @@ export default function Dashboard() {
   }, [allTasks]);
 
   const statusChartData = useMemo(() => [
-    { name: 'To Do', value: stats.todo, fill: 'hsl(235, 40%, 55%)' },
-    { name: 'In Progress', value: stats.inProgress, fill: 'hsl(25, 70%, 55%)' },
-    { name: 'Done', value: stats.done, fill: 'hsl(150, 35%, 50%)' }
+    { name: 'To Do',      value: stats.todo,       fill: '#6366f1' },
+    { name: 'In Progress',value: stats.inProgress, fill: '#f59e0b' },
+    { name: 'Done',       value: stats.done,       fill: '#14b8a6' }
   ], [stats]);
 
   const priorityChartData = useMemo(() => {
     const high = allTasks.filter(t => t.priority === 'high').length;
-    const med = allTasks.filter(t => t.priority === 'medium').length;
-    const low = allTasks.filter(t => t.priority === 'low').length;
+    const med  = allTasks.filter(t => t.priority === 'medium').length;
+    const low  = allTasks.filter(t => t.priority === 'low').length;
     return [
-      { name: 'High', count: high, fill: 'hsl(350, 60%, 55%)' },
-      { name: 'Medium', count: med, fill: 'hsl(25, 70%, 55%)' },
-      { name: 'Low', count: low, fill: 'hsl(150, 35%, 50%)' }
+      { name: 'High',   count: high, fill: '#ef4444' },
+      { name: 'Medium', count: med,  fill: '#f59e0b' },
+      { name: 'Low',    count: low,  fill: '#14b8a6' }
     ];
   }, [allTasks]);
 
@@ -115,12 +118,15 @@ export default function Dashboard() {
       <div className={styles.header}>
         <div>
           <h1 className={styles.greeting}>
-            Welcome, <span className={styles.greetingAccent}>{user?.name}</span> 🌸
+            Good day, <span className={styles.greetingAccent}>{user?.name}</span>
           </h1>
           <p className={styles.headerSub}>
-            {boards.length} {boards.length === 1 ? 'board' : 'boards'} · {stats.total} tasks
+            {boards.length} {boards.length === 1 ? 'board' : 'boards'} &middot; {stats.total} tasks total
           </p>
         </div>
+        <button className={styles.createBtn} onClick={() => document.getElementById('create-board-btn')?.click()}>
+          <IoAdd /> New Board
+        </button>
       </div>
 
       {/* Stats */}
@@ -128,18 +134,30 @@ export default function Dashboard() {
         <>
           <div className={styles.statGrid}>
             <div className={`${styles.statCard} ${styles.statTodo}`}>
+              <div className={styles.statIconRow}>
+                <div className={styles.statIcon}><IoList /></div>
+              </div>
               <div className={styles.statNumber}>{stats.todo}</div>
               <div className={styles.statLabel}>To Do</div>
             </div>
             <div className={`${styles.statCard} ${styles.statProgress}`}>
+              <div className={styles.statIconRow}>
+                <div className={styles.statIcon}><IoTimeOutline /></div>
+              </div>
               <div className={styles.statNumber}>{stats.inProgress}</div>
               <div className={styles.statLabel}>In Progress</div>
             </div>
             <div className={`${styles.statCard} ${styles.statDone}`}>
+              <div className={styles.statIconRow}>
+                <div className={styles.statIcon}><IoCheckmarkDone /></div>
+              </div>
               <div className={styles.statNumber}>{stats.done}</div>
-              <div className={styles.statLabel}>Done</div>
+              <div className={styles.statLabel}>Completed</div>
             </div>
             <div className={`${styles.statCard} ${styles.statOverdue}`}>
+              <div className={styles.statIconRow}>
+                <div className={styles.statIcon}><IoWarning /></div>
+              </div>
               <div className={styles.statNumber}>{stats.overdue}</div>
               <div className={styles.statLabel}>Overdue</div>
             </div>
@@ -174,10 +192,12 @@ export default function Dashboard() {
         </>
       )}
 
-      {/* Boards */}
-      <h2 className={styles.sectionTitle}>
-        <IoLayersOutline /> Your Boards
-      </h2>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>
+          <IoLayersOutline /> Your Boards
+          {boards.length > 0 && <span className={styles.sectionCount}>{boards.length}</span>}
+        </h2>
+      </div>
 
       {boards.length === 0 ? (
         <div className={styles.emptyState}>
@@ -252,7 +272,7 @@ export default function Dashboard() {
             />
           </div>
           <button type="submit"
-            style={{ width: '100%', padding: 'var(--space-3) var(--space-6)', borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--sakura-deep), var(--indigo))', color: 'white', fontWeight: 600, fontSize: 'var(--font-size-base)', cursor: 'pointer' }}>
+            style={{ width: '100%', padding: 'var(--space-3) var(--space-6)', borderRadius: 'var(--radius-md)', background: '#6366f1', color: 'white', fontWeight: 700, fontSize: 'var(--font-size-base)', cursor: 'pointer', border: 'none', boxShadow: '0 3px 12px rgba(99,102,241,0.35)', transition: 'background 0.2s' }}>
             Save Changes
           </button>
         </form>

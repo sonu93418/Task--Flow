@@ -1,0 +1,189 @@
+.page { max-width: var(--content-max-width); margin: 0 auto; }
+
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);
+}
+
+.titleArea { display: flex; align-items: center; gap: var(--space-3); }
+
+.backBtn {
+  width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-md); color: var(--text-secondary); font-size: 1.2rem;
+  transition: all var(--transition-fast);
+}
+.backBtn:hover { background: var(--bg-elevated); color: var(--text-primary); }
+
+.boardTitle {
+  font-family: var(--font-serif); font-size: var(--font-size-2xl); font-weight: 500;
+}
+
+.controls {
+  display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap;
+}
+
+.searchInput {
+  padding: var(--space-2) var(--space-4) var(--space-2) 36px;
+  border-radius: var(--radius-md); border: 1px solid var(--border);
+  background: var(--bg-input); color: var(--text-primary);
+  font-size: var(--font-size-sm); width: 200px; outline: none;
+  transition: border-color var(--transition-fast);
+}
+.searchInput:focus { border-color: var(--sakura); }
+
+.searchWrapper { position: relative; }
+.searchIcon {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); font-size: 1rem; pointer-events: none;
+}
+
+.filterSelect {
+  padding: var(--space-2) var(--space-4); border-radius: var(--radius-md);
+  border: 1px solid var(--border); background: var(--bg-input);
+  color: var(--text-primary); font-size: var(--font-size-sm); outline: none;
+  cursor: pointer;
+}
+
+/* ── Kanban Board ── */
+.kanban {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5);
+  min-height: 60vh;
+}
+
+.column {
+  background: var(--bg-secondary); border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light); display: flex; flex-direction: column;
+  min-height: 300px;
+}
+
+.columnHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-light);
+}
+
+.columnTitle {
+  display: flex; align-items: center; gap: var(--space-3);
+  font-size: var(--font-size-sm); font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.columnDot {
+  width: 8px; height: 8px; border-radius: var(--radius-full);
+}
+.dotTodo { background: var(--status-todo); }
+.dotProgress { background: var(--status-progress); }
+.dotDone { background: var(--status-done); }
+
+.columnCount {
+  background: var(--bg-primary); padding: 2px 8px; border-radius: var(--radius-full);
+  font-size: var(--font-size-xs); color: var(--text-muted); font-weight: 500;
+}
+
+.columnBody {
+  flex: 1; padding: var(--space-3); display: flex; flex-direction: column;
+  gap: var(--space-3); overflow-y: auto;
+}
+
+.columnDropZone {
+  flex: 1; min-height: 80px; border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.columnDropZoneActive {
+  background: hsla(340, 65%, 75%, 0.05); border: 2px dashed var(--sakura);
+}
+
+.addTaskBtn {
+  display: flex; align-items: center; justify-content: center; gap: var(--space-2);
+  padding: var(--space-3); margin: var(--space-3); border-radius: var(--radius-md);
+  color: var(--text-muted); font-size: var(--font-size-sm); font-weight: 500;
+  border: 1px dashed var(--border); transition: all var(--transition-fast);
+}
+.addTaskBtn:hover {
+  color: var(--sakura); border-color: var(--sakura);
+  background: hsla(340, 65%, 75%, 0.05);
+}
+
+/* ── Task Card ── */
+.taskCard {
+  background: var(--bg-card); border: 1px solid var(--border-light);
+  border-radius: var(--radius-md); padding: var(--space-4);
+  cursor: grab; transition: all var(--transition-fast);
+  position: relative;
+}
+.taskCard:hover {
+  box-shadow: var(--shadow-md); border-color: var(--border);
+  transform: translateY(-1px);
+}
+.taskCard:active { cursor: grabbing; }
+
+.taskDragging {
+  opacity: 0.5; box-shadow: var(--shadow-lg);
+}
+
+.taskCardHeader {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: var(--space-2); gap: var(--space-2);
+}
+
+.taskTitle {
+  font-size: var(--font-size-sm); font-weight: 500; color: var(--text-primary);
+  flex: 1; line-height: var(--line-height-normal);
+}
+
+.taskActions {
+  display: flex; gap: 2px; flex-shrink: 0; opacity: 0; transition: opacity var(--transition-fast);
+}
+.taskCard:hover .taskActions { opacity: 1; }
+
+.taskActionBtn {
+  width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm); color: var(--text-muted); font-size: 0.8rem;
+  transition: all var(--transition-fast);
+}
+.taskActionBtn:hover { background: var(--bg-elevated); color: var(--text-primary); }
+.taskActionBtn.danger:hover { background: var(--priority-high-bg); color: var(--danger); }
+
+.taskDesc {
+  font-size: var(--font-size-xs); color: var(--text-secondary);
+  margin-bottom: var(--space-3); display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden; line-height: var(--line-height-relaxed);
+}
+
+.taskMeta {
+  display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;
+}
+
+.priorityBadge {
+  font-size: 0.65rem; padding: 2px 8px; border-radius: var(--radius-full);
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.priorityHigh { background: var(--priority-high-bg); color: var(--priority-high); }
+.priorityMedium { background: var(--priority-medium-bg); color: var(--priority-medium); }
+.priorityLow { background: var(--priority-low-bg); color: var(--priority-low); }
+
+.dueBadge {
+  font-size: var(--font-size-xs); color: var(--text-muted);
+  display: flex; align-items: center; gap: 4px;
+}
+.dueOverdue { color: var(--danger); font-weight: 500; }
+
+.effortBadge {
+  font-size: 0.65rem; padding: 2px 6px; border-radius: var(--radius-full);
+  background: var(--bg-elevated); color: var(--text-muted); font-weight: 500;
+}
+
+.columnEmpty {
+  text-align: center; padding: var(--space-8) var(--space-4);
+  color: var(--text-muted); font-size: var(--font-size-sm); font-style: italic;
+}
+
+@media (max-width: 900px) {
+  .kanban { grid-template-columns: 1fr; }
+  .column { min-height: 200px; }
+}
+
+@media (max-width: 600px) {
+  .controls { width: 100%; }
+  .searchInput { width: 100%; }
+}

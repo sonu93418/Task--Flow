@@ -1,0 +1,17 @@
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-card-hover) 50%, var(--bg-elevated) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+.text { height: 14px; margin-bottom: var(--space-2); }
+.title { height: 22px; width: 60%; margin-bottom: var(--space-3); }
+.card { height: 120px; width: 100%; }
+.avatar { height: 40px; width: 40px; border-radius: var(--radius-full); }
+.button { height: 40px; width: 120px; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

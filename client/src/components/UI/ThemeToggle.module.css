@@ -1,0 +1,41 @@
+.toggle {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.toggle:hover {
+  border-color: var(--sakura);
+  box-shadow: var(--shadow-glow);
+}
+
+.indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--sakura);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: white;
+  transition: transform var(--transition-spring);
+  box-shadow: 0 2px 4px hsla(0, 0%, 0%, 0.2);
+}
+
+.dark .indicator {
+  transform: translateX(0);
+}
+
+.light .indicator {
+  transform: translateX(24px);
+  background: var(--kitsune);
+}

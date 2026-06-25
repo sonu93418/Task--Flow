@@ -1,0 +1,120 @@
+.form { display: flex; flex-direction: column; gap: var(--space-5); }
+
+.field {}
+
+.label {
+  display: block; font-size: var(--font-size-sm); font-weight: 500;
+  color: var(--text-secondary); margin-bottom: var(--space-2);
+}
+
+.input, .textarea, .select {
+  width: 100%; padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md); border: 1px solid var(--border);
+  background: var(--bg-input); color: var(--text-primary);
+  font-size: var(--font-size-base); outline: none;
+  transition: border-color var(--transition-fast);
+  font-family: var(--font-sans);
+}
+
+.input:focus, .textarea:focus, .select:focus {
+  border-color: var(--sakura);
+  box-shadow: 0 0 0 3px hsla(340, 65%, 75%, 0.12);
+}
+
+.textarea { resize: vertical; min-height: 80px; }
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+
+.aiSection {
+  background: var(--bg-secondary); border: 1px solid var(--border-light);
+  border-radius: var(--radius-md); padding: var(--space-4);
+}
+
+.aiHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.aiTitle {
+  font-size: var(--font-size-sm); font-weight: 600; color: var(--text-secondary);
+  display: flex; align-items: center; gap: var(--space-2);
+}
+
+.aiBtn {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-2) var(--space-4); border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--sakura), var(--indigo-light));
+  color: white; font-size: var(--font-size-xs); font-weight: 600;
+  transition: all var(--transition-fast);
+}
+.aiBtn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-sakura); }
+.aiBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.aiResult {
+  background: var(--bg-card); border: 1px solid var(--border-light);
+  border-radius: var(--radius-md); padding: var(--space-4); margin-top: var(--space-3);
+}
+
+.aiResultGrid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.aiResultItem { text-align: center; }
+
+.aiResultLabel {
+  font-size: var(--font-size-xs); color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+}
+
+.aiResultValue {
+  font-size: var(--font-size-md); font-weight: 600; color: var(--text-primary);
+}
+
+.aiReasoning {
+  font-size: var(--font-size-xs); color: var(--text-secondary);
+  font-style: italic; margin-bottom: var(--space-3);
+  line-height: var(--line-height-relaxed);
+}
+
+.aiMock {
+  font-size: var(--font-size-xs); color: var(--kitsune);
+  margin-bottom: var(--space-3);
+}
+
+.aiAcceptBtn {
+  width: 100%; padding: var(--space-2); border-radius: var(--radius-md);
+  background: var(--success); color: white; font-size: var(--font-size-sm);
+  font-weight: 600; transition: all var(--transition-fast);
+}
+.aiAcceptBtn:hover { opacity: 0.9; }
+
+.aiLoading {
+  display: flex; align-items: center; justify-content: center; gap: var(--space-3);
+  padding: var(--space-4); color: var(--text-secondary); font-size: var(--font-size-sm);
+}
+
+.spinner {
+  width: 20px; height: 20px; border: 2px solid var(--border);
+  border-top-color: var(--sakura); border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.submitBtn {
+  width: 100%; padding: var(--space-3) var(--space-6); border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--sakura-deep), var(--indigo));
+  color: white; font-weight: 600; font-size: var(--font-size-base);
+  transition: all var(--transition-fast); cursor: pointer; border: none;
+}
+.submitBtn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-sakura); }
+.submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.deleteBtn {
+  width: 100%; padding: var(--space-3); border-radius: var(--radius-md);
+  background: var(--priority-high-bg); color: var(--danger);
+  font-weight: 500; font-size: var(--font-size-sm); transition: all var(--transition-fast);
+  cursor: pointer; border: none; margin-top: var(--space-2);
+}
+.deleteBtn:hover { opacity: 0.8; }
+
+@keyframes spin { to { transform: rotate(360deg); } }

@@ -38,14 +38,17 @@
 }
 
 .navLogo { display: flex; align-items: center; gap: 0.5rem; }
-.navLogoMark {
-  width: 32px; height: 32px;
-  border-radius: var(--radius-md);
-  background: var(--indigo);
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 1rem;
-  flex-shrink: 0;
-  box-shadow: 0 3px 10px hsla(235, 45%, 40%, 0.35);
+.navLogoImg {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  filter: contrast(1.2) brightness(1.05);
+}
+
+:global([data-theme="light"]) .navLogoImg {
+  filter: invert(1) hue-rotate(180deg) contrast(1.1);
+  mix-blend-mode: multiply;
 }
 .navLogoText {
   font-size: 1.15rem;
@@ -664,12 +667,17 @@
 }
 .footerInner { max-width: 1200px; margin: 0 auto; text-align: center; }
 .footerLogo { display: inline-flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
-.footerLogoMark {
-  width: 28px; height: 28px;
-  border-radius: var(--radius-sm);
-  background: var(--indigo);
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 0.85rem;
+.footerLogoImg {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  filter: contrast(1.2) brightness(1.05);
+}
+
+:global([data-theme="light"]) .footerLogoImg {
+  filter: invert(1) hue-rotate(180deg) contrast(1.1);
+  mix-blend-mode: multiply;
 }
 .footerLogoText { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
 .footerTagline { font-size: 0.875rem; color: var(--text-secondary); margin: 0 0 1.5rem; }

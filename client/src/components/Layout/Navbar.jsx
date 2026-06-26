@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import { IoMenu, IoLogOutOutline, IoRocketOutline } from 'react-icons/io5';
+import { IoMenu, IoLogOutOutline } from 'react-icons/io5';
 import { useAuth } from '../../hooks/useAuth';
 import ThemeToggle from '../UI/ThemeToggle';
 import styles from './Navbar.module.css';
+import logoSvg from '../../assets/logo.svg';
 
 export default function Navbar({ onToggleSidebar }) {
   const { user, logout } = useAuth();
@@ -14,7 +15,7 @@ export default function Navbar({ onToggleSidebar }) {
           <IoMenu />
         </button>
         <Link to="/" className={styles.logo}>
-          <IoRocketOutline className={styles.logoIcon} />
+          <img src={logoSvg} className={styles.logoImg} alt="TaskFlow" />
           <span className={styles.logoText}>
             Task<span className={styles.logoAccent}>Flow</span>
           </span>

@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   IoCheckmarkCircle, IoLayersOutline, IoSparkles, IoShieldCheckmark,
   IoTrendingUp, IoPeopleOutline, IoCalendarOutline, IoArrowForward,
@@ -7,6 +7,7 @@ import {
 } from 'react-icons/io5';
 import ThemeToggle from '../components/UI/ThemeToggle';
 import styles from './Landing.module.css';
+import logoSvg from '../assets/logo.svg';
 
 const FEATURES = [
   {
@@ -103,9 +104,7 @@ export default function Landing() {
       <nav className={styles.nav}>
         <div className={styles.navInner}>
           <div className={styles.navLogo}>
-            <div className={styles.navLogoMark}>
-              <IoRocketOutline />
-            </div>
+            <img src={logoSvg} className={styles.navLogoImg} alt="TaskFlow" />
             <span className={styles.navLogoText}>TaskFlow</span>
           </div>
           <div className={styles.navLinks}>
@@ -437,7 +436,7 @@ export default function Landing() {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <div className={styles.footerLogo}>
-            <div className={styles.footerLogoMark}><IoRocketOutline /></div>
+            <img src={logoSvg} className={styles.footerLogoImg} alt="TaskFlow" />
             <span className={styles.footerLogoText}>TaskFlow</span>
           </div>
           <p className={styles.footerTagline}>

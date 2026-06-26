@@ -103,14 +103,14 @@ export default function Layout() {
             disabled={creating || !newBoardTitle.trim()}
             style={{
               width: '100%', padding: 'var(--space-3) var(--space-6)', borderRadius: 'var(--radius-md)',
-              background: 'linear-gradient(135deg, var(--sakura-deep), var(--indigo))',
-              color: 'white', fontWeight: 600, fontSize: 'var(--font-size-base)',
+              background: 'var(--indigo)',
+              color: 'white', fontWeight: 700, fontSize: 'var(--font-size-base)',
               transition: 'all var(--transition-fast)', opacity: creating ? 0.7 : 1,
               cursor: creating ? 'not-allowed' : 'pointer'
             }}
             id="create-board-submit"
           >
-            {creating ? 'Creating...' : '🌸 Create Board'}
+            {creating ? 'Creating...' : 'Create Board'}
           </button>
         </form>
       </Modal>

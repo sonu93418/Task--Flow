@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   IoMailOutline, IoLockClosedOutline, IoAlertCircle,
-  IoEyeOutline, IoEyeOffOutline
+  IoEyeOutline, IoEyeOffOutline, IoRocketOutline
 } from 'react-icons/io5';
 import { useAuth } from '../hooks/useAuth';
 import styles from './Auth.module.css';
@@ -35,7 +35,7 @@ export default function Login() {
       <div className={styles.container}>
 
         <div className={styles.header}>
-          <span className={styles.logoIcon}>🌸</span>
+          <IoRocketOutline className={styles.logoIcon} />
           <h1 className={styles.title}>
             Welcome <span className={styles.titleAccent}>Back</span>
           </h1>

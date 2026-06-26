@@ -1,10 +1,11 @@
-.form { display: flex; flex-direction: column; gap: var(--space-5); }
+﻿.form { display: flex; flex-direction: column; gap: var(--space-5); }
 
 .field {}
 
 .label {
-  display: block; font-size: var(--font-size-sm); font-weight: 500;
+  display: block; font-size: var(--font-size-sm); font-weight: 600;
   color: var(--text-secondary); margin-bottom: var(--space-2);
+  letter-spacing: 0.01em;
 }
 
 .input, .textarea, .select {
@@ -12,16 +13,17 @@
   border-radius: var(--radius-md); border: 1px solid var(--border);
   background: var(--bg-input); color: var(--text-primary);
   font-size: var(--font-size-base); outline: none;
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-hover), box-shadow var(--transition-hover);
   font-family: var(--font-sans);
 }
+.input::placeholder, .textarea::placeholder { color: var(--text-muted); }
 
 .input:focus, .textarea:focus, .select:focus {
-  border-color: var(--sakura);
-  box-shadow: 0 0 0 3px hsla(340, 65%, 75%, 0.12);
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px hsla(235, 40%, 55%, 0.14);
 }
 
-.textarea { resize: vertical; min-height: 80px; }
+.textarea { resize: vertical; min-height: 90px; }
 
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
 
@@ -45,9 +47,14 @@
   padding: var(--space-2) var(--space-4); border-radius: var(--radius-md);
   background: linear-gradient(135deg, var(--sakura), var(--indigo-light));
   color: white; font-size: var(--font-size-xs); font-weight: 600;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-hover);
 }
-.aiBtn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-sakura); }
+.aiBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sakura);
+  filter: brightness(1.08);
+}
+.aiBtn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
 .aiBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .aiResult {
@@ -85,9 +92,13 @@
 .aiAcceptBtn {
   width: 100%; padding: var(--space-2); border-radius: var(--radius-md);
   background: var(--success); color: white; font-size: var(--font-size-sm);
-  font-weight: 600; transition: all var(--transition-fast);
+  font-weight: 600; transition: all var(--transition-hover);
 }
-.aiAcceptBtn:hover { opacity: 0.9; }
+.aiAcceptBtn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.aiAcceptBtn:focus-visible { outline: 2px solid var(--matcha); outline-offset: 2px; }
 
 .aiLoading {
   display: flex; align-items: center; justify-content: center; gap: var(--space-3);
@@ -101,20 +112,34 @@
 }
 
 .submitBtn {
-  width: 100%; padding: var(--space-3) var(--space-6); border-radius: var(--radius-md);
+  width: 100%; padding: 0.85rem var(--space-6); border-radius: var(--radius-md);
   background: linear-gradient(135deg, var(--sakura-deep), var(--indigo));
-  color: white; font-weight: 600; font-size: var(--font-size-base);
-  transition: all var(--transition-fast); cursor: pointer; border: none;
+  color: white; font-weight: 700; font-size: var(--font-size-base);
+  transition: all var(--transition-hover); cursor: pointer; border: none;
+  box-shadow: 0 4px 14px hsla(235, 45%, 40%, 0.3);
+  letter-spacing: 0.02em;
 }
-.submitBtn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-sakura); }
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px hsla(235, 45%, 55%, 0.4);
+  filter: brightness(1.08);
+}
+.submitBtn:active:not(:disabled) { transform: translateY(0); }
+.submitBtn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 3px; }
 .submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .deleteBtn {
   width: 100%; padding: var(--space-3); border-radius: var(--radius-md);
   background: var(--priority-high-bg); color: var(--danger);
-  font-weight: 500; font-size: var(--font-size-sm); transition: all var(--transition-fast);
-  cursor: pointer; border: none; margin-top: var(--space-2);
+  font-weight: 500; font-size: var(--font-size-sm);
+  transition: all var(--transition-hover);
+  cursor: pointer; border: 1px solid transparent; margin-top: var(--space-2);
 }
-.deleteBtn:hover { opacity: 0.8; }
+.deleteBtn:hover {
+  border-color: hsla(350, 60%, 55%, 0.3);
+  background: hsla(350, 60%, 55%, 0.16);
+  transform: translateY(-1px);
+}
+.deleteBtn:focus-visible { outline: 2px solid var(--danger); outline-offset: 2px; }
 
 @keyframes spin { to { transform: rotate(360deg); } }

@@ -7,33 +7,34 @@ export default function NotFound() {
       background: 'var(--bg-primary)', padding: 'var(--space-4)', textAlign: 'center'
     }}>
       <div>
-        <div style={{ fontSize: '5rem', marginBottom: 'var(--space-4)' }}>🏔️</div>
+        <div style={{ fontSize: '5rem', marginBottom: 'var(--space-4)' }}>🚀</div>
         <h1 style={{
-          fontFamily: 'var(--font-serif)', fontSize: 'var(--font-size-4xl)',
-          fontWeight: 700, marginBottom: 'var(--space-3)', color: 'var(--text-primary)'
+          fontFamily: 'var(--font-sans)', fontSize: 'var(--font-size-4xl)',
+          fontWeight: 800, marginBottom: 'var(--space-3)', color: 'var(--text-primary)',
+          letterSpacing: '-0.02em'
         }}>
           404
         </h1>
         <h2 style={{
-          fontFamily: 'var(--font-serif)', fontSize: 'var(--font-size-xl)',
-          fontWeight: 400, marginBottom: 'var(--space-4)', color: 'var(--text-secondary)'
+          fontFamily: 'var(--font-sans)', fontSize: 'var(--font-size-xl)',
+          fontWeight: 600, marginBottom: 'var(--space-4)', color: 'var(--text-secondary)'
         }}>
-          This path leads nowhere
+          Page Not Found
         </h2>
         <p style={{
           color: 'var(--text-muted)', fontSize: 'var(--font-size-base)',
           marginBottom: 'var(--space-8)', maxWidth: '400px', margin: '0 auto var(--space-8)'
         }}>
-          Like a stone garden path that fades into mist, the page you seek does not exist.
+          The link you followed may be broken, or the page may have been moved.
         </p>
         <Link to="/" style={{
           display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
           padding: 'var(--space-3) var(--space-8)', borderRadius: 'var(--radius-md)',
-          background: 'linear-gradient(135deg, var(--sakura-deep), var(--indigo))',
-          color: 'white', fontWeight: 600, fontSize: 'var(--font-size-md)',
+          background: 'var(--indigo)',
+          color: 'white', fontWeight: 700, fontSize: 'var(--font-size-md)',
           textDecoration: 'none', transition: 'all 200ms ease'
         }}>
-          🌸 Return Home
+          Return Home
         </Link>
       </div>
     </div>

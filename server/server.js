@@ -39,7 +39,7 @@ app.use('/api/ai', aiRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'TaskFlow API is running 🌸' });
+  res.json({ success: true, message: 'TaskFlow API is running' });
 });
 
 // 404 handler
@@ -54,7 +54,7 @@ app.use(errorHandler);
 const start = async () => {
   await connectDB();
   const server = app.listen(PORT, () => {
-    console.log(`🌸 TaskFlow server running on port ${PORT}`);
+    console.log(`🚀 TaskFlow server running on port ${PORT}`);
     console.log(`📡 API Base: http://localhost:${PORT}/api`);
   });
 

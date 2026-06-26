@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { IoMenu, IoLogOutOutline } from 'react-icons/io5';
+import { IoMenu, IoLogOutOutline, IoRocketOutline } from 'react-icons/io5';
 import { useAuth } from '../../hooks/useAuth';
 import ThemeToggle from '../UI/ThemeToggle';
 import styles from './Navbar.module.css';
@@ -14,7 +14,7 @@ export default function Navbar({ onToggleSidebar }) {
           <IoMenu />
         </button>
         <Link to="/" className={styles.logo}>
-          <span className={styles.logoIcon}>🌸</span>
+          <IoRocketOutline className={styles.logoIcon} />
           <span className={styles.logoText}>
             Task<span className={styles.logoAccent}>Flow</span>
           </span>

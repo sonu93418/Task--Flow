@@ -182,7 +182,7 @@ export default function TaskModal({ isOpen, onClose, onSubmit, onDelete, task, m
         </div>
 
         <button type="submit" className={styles.submitBtn} disabled={submitting || !title.trim()} id="task-submit">
-          {submitting ? 'Saving...' : mode === 'edit' ? 'Save Changes' : '🌸 Create Task'}
+          {submitting ? 'Saving...' : mode === 'edit' ? 'Save Changes' : 'Create Task'}
         </button>
 
         {mode === 'edit' && onDelete && (

@@ -1,27 +1,26 @@
 /* ========================================
-   TaskFlow — Japanese / Japandi Design System
-   Inspired by: wabi-sabi, zen gardens, cherry blossoms,
-   natural textures, clean minimalism
+   TaskFlow — Core UI/UX Design System
+   Professional, high-contrast theme variables
    ======================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+JP:wght@300;400;500;700&display=swap');
 
 /* ── CSS Custom Properties ── */
 :root {
-  /* ─ Japanese Color Palette ─ */
-  --sakura: hsl(340, 65%, 75%);           /* Cherry blossom pink */
+  /* ─ Core Color Palette ─ */
+  --sakura: hsl(340, 65%, 75%);
   --sakura-light: hsl(340, 70%, 88%);
   --sakura-deep: hsl(340, 55%, 55%);
-  --indigo: hsl(235, 45%, 40%);           /* 藍 Ai - traditional indigo */
+  --indigo: hsl(235, 45%, 40%);
   --indigo-light: hsl(235, 40%, 55%);
   --indigo-deep: hsl(235, 50%, 28%);
-  --matcha: hsl(150, 35%, 50%);           /* 抹茶 Matcha green */
+  --matcha: hsl(150, 35%, 50%);
   --matcha-light: hsl(150, 40%, 65%);
-  --washi: hsl(38, 30%, 92%);            /* 和紙 Washi paper cream */
-  --sumi: hsl(220, 15%, 18%);            /* 墨 Sumi ink black */
-  --kinari: hsl(42, 40%, 95%);           /* 生成り Natural unbleached */
-  --kitsune: hsl(25, 70%, 55%);          /* 狐 Fox amber/rust */
-  --ume: hsl(350, 60%, 55%);             /* 梅 Plum red */
+  --washi: hsl(38, 30%, 92%);
+  --sumi: hsl(220, 15%, 18%);
+  --kinari: hsl(42, 40%, 95%);
+  --kitsune: hsl(25, 70%, 55%);
+  --ume: hsl(350, 60%, 55%);
 
   /* ─ Semantic Colors ─ */
   --primary: var(--indigo);
@@ -50,22 +49,22 @@
   --status-done-bg: hsla(150, 35%, 50%, 0.10);
 
   /* ─ Dark Theme (default) ─ */
-  --bg-primary: hsl(225, 20%, 7%);
-  --bg-secondary: hsl(225, 18%, 11%);
-  --bg-card: hsl(225, 16%, 14%);
-  --bg-card-hover: hsl(225, 16%, 17%);
-  --bg-elevated: hsl(225, 14%, 18%);
-  --bg-glass: hsla(225, 18%, 15%, 0.7);
-  --bg-overlay: hsla(225, 25%, 5%, 0.75);
-  --bg-input: hsl(225, 16%, 12%);
+  --bg-primary: #0b0b14;              /* deep dark — matches landing */
+  --bg-secondary: #0f0f1a;
+  --bg-card: #13131f;
+  --bg-card-hover: #17172a;
+  --bg-elevated: #1c1c2e;
+  --bg-glass: rgba(13,13,26,0.85);
+  --bg-overlay: rgba(0,0,0,0.72);
+  --bg-input: #1a1a2e;
 
   --text-primary: hsl(38, 25%, 92%);
-  --text-secondary: hsl(225, 12%, 58%);
-  --text-muted: hsl(225, 10%, 42%);
+  --text-secondary: hsl(225, 12%, 62%);
+  --text-muted: hsl(225, 10%, 46%);
   --text-inverse: hsl(225, 20%, 7%);
 
-  --border: hsla(225, 15%, 25%, 0.5);
-  --border-light: hsla(225, 15%, 25%, 0.25);
+  --border: hsla(225, 15%, 28%, 0.6);
+  --border-light: hsla(225, 15%, 28%, 0.3);
   --border-focus: var(--indigo-light);  /* indigo focus ring, not pink */
 
   --scrollbar-bg: hsl(225, 18%, 11%);
@@ -99,25 +98,29 @@
   --space-12: 3rem;
   --space-16: 4rem;
 
-  /* ─ Radius ─ */
+  /* ─ Radius — upgraded for premium feel ─ */
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
   --radius-full: 9999px;
 
-  /* ─ Shadows ─ */
-  --shadow-sm: 0 1px 3px hsla(0, 0%, 0%, 0.15), 0 1px 2px hsla(0, 0%, 0%, 0.10);
-  --shadow-md: 0 4px 12px hsla(0, 0%, 0%, 0.2), 0 2px 4px hsla(0, 0%, 0%, 0.12);
-  --shadow-lg: 0 8px 28px hsla(0, 0%, 0%, 0.3), 0 4px 8px hsla(0, 0%, 0%, 0.15);
-  --shadow-xl: 0 16px 48px hsla(0, 0%, 0%, 0.35);
-  --shadow-glow: 0 0 20px hsla(235, 45%, 55%, 0.2);   /* indigo glow */
-  --shadow-sakura: 0 4px 20px hsla(235, 45%, 55%, 0.25); /* repurposed to indigo */
+  /* ─ Shadows — richer layered system ─ */
+  --shadow-sm:  0 1px 3px hsla(0,0%,0%,0.18), 0 1px 2px hsla(0,0%,0%,0.12);
+  --shadow-md:  0 4px 12px hsla(0,0%,0%,0.22), 0 2px 4px hsla(0,0%,0%,0.14);
+  --shadow-lg:  0 8px 30px hsla(0,0%,0%,0.32), 0 4px 8px hsla(0,0%,0%,0.16);
+  --shadow-xl:  0 16px 52px hsla(0,0%,0%,0.38), 0 6px 16px hsla(0,0%,0%,0.2);
+  --shadow-card: 0 2px 8px hsla(0,0%,0%,0.22), 0 0 0 1px hsla(225,15%,28%,0.3);
+  --shadow-card-hover: 0 8px 28px hsla(0,0%,0%,0.35), 0 2px 6px hsla(0,0%,0%,0.18);
+  --shadow-float: 0 20px 60px hsla(0,0%,0%,0.45), 0 8px 20px hsla(0,0%,0%,0.22);
+  --shadow-glow: 0 0 24px hsla(235, 45%, 55%, 0.22);   /* indigo glow */
+  --shadow-sakura: 0 4px 22px hsla(235, 45%, 55%, 0.28); /* repurposed to indigo */
 
-  /* ─ Transitions ─ */
+  /* ─ Transitions — refined ─ */
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
   --transition-slow: 400ms ease;
+  --transition-hover: 220ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* ─ Layout ─ */
@@ -128,33 +131,40 @@
 
 /* ── Light Theme ── */
 [data-theme="light"] {
-  --bg-primary: hsl(40, 25%, 96%);
-  --bg-secondary: hsl(40, 20%, 92%);
-  --bg-card: hsl(40, 30%, 98%);
-  --bg-card-hover: hsl(40, 25%, 95%);
+  --bg-primary: hsl(40, 28%, 95%);
+  --bg-secondary: hsl(40, 22%, 91%);
+  --bg-card: hsl(0, 0%, 100%);
+  --bg-card-hover: hsl(40, 30%, 98%);
   --bg-elevated: hsl(0, 0%, 100%);
-  --bg-glass: hsla(40, 25%, 97%, 0.8);
-  --bg-overlay: hsla(40, 15%, 30%, 0.4);
-  --bg-input: hsl(40, 20%, 95%);
+  --bg-glass: hsla(0, 0%, 100%, 0.88);
+  --bg-overlay: hsla(220, 25%, 20%, 0.45);
+  --bg-input: hsl(40, 20%, 97%);
 
-  --text-primary: hsl(225, 25%, 15%);
-  --text-secondary: hsl(225, 12%, 45%);
-  --text-muted: hsl(225, 8%, 62%);
+  /* Improved contrast for light mode */
+  --text-primary: hsl(225, 30%, 12%);
+  --text-secondary: hsl(225, 18%, 35%);
+  --text-muted: hsl(225, 12%, 50%);
   --text-inverse: hsl(40, 25%, 96%);
 
-  --border: hsla(225, 15%, 70%, 0.3);
-  --border-light: hsla(225, 15%, 80%, 0.2);
+  /* Stronger, more visible borders in light mode */
+  --border: hsla(225, 15%, 55%, 0.35);
+  --border-light: hsla(225, 15%, 60%, 0.22);
 
-  --shadow-sm: 0 1px 3px hsla(225, 15%, 0%, 0.05), 0 1px 2px hsla(225, 15%, 0%, 0.03);
-  --shadow-md: 0 4px 12px hsla(225, 15%, 0%, 0.08), 0 2px 4px hsla(225, 15%, 0%, 0.04);
-  --shadow-lg: 0 8px 28px hsla(225, 15%, 0%, 0.1), 0 4px 8px hsla(225, 15%, 0%, 0.05);
-  --shadow-xl: 0 16px 48px hsla(225, 15%, 0%, 0.12);
-  --shadow-glow: 0 0 20px hsla(340, 65%, 75%, 0.1);
-  --shadow-sakura: 0 4px 20px hsla(340, 65%, 75%, 0.15);
+  /* Light mode shadows — visible depth without darkness */
+  --shadow-sm:  0 1px 4px hsla(225,20%,20%,0.07), 0 1px 2px hsla(225,20%,20%,0.05);
+  --shadow-md:  0 4px 14px hsla(225,20%,20%,0.10), 0 2px 4px hsla(225,20%,20%,0.06);
+  --shadow-lg:  0 8px 28px hsla(225,20%,20%,0.12), 0 4px 8px hsla(225,20%,20%,0.07);
+  --shadow-xl:  0 16px 50px hsla(225,20%,20%,0.15), 0 6px 14px hsla(225,20%,20%,0.08);
+  --shadow-card: 0 2px 10px hsla(225,20%,20%,0.10), 0 0 0 1px hsla(225,15%,55%,0.18);
+  --shadow-card-hover: 0 8px 28px hsla(225,20%,20%,0.14), 0 2px 6px hsla(225,20%,20%,0.08);
+  --shadow-float: 0 20px 60px hsla(225,20%,20%,0.18), 0 8px 20px hsla(225,20%,20%,0.10);
+  --shadow-glow: 0 0 20px hsla(340, 65%, 75%, 0.12);
+  --shadow-sakura: 0 4px 20px hsla(340, 65%, 75%, 0.18);
 
   --scrollbar-bg: hsl(40, 20%, 92%);
-  --scrollbar-thumb: hsl(225, 10%, 78%);
+  --scrollbar-thumb: hsl(225, 12%, 72%);
 }
+
 
 /* ── Global Reset ── */
 *, *::before, *::after {
@@ -240,8 +250,8 @@ img {
 
 /* ── Selection ── */
 ::selection {
-  background: hsla(340, 65%, 75%, 0.3);
-  color: var(--text-primary);
+  background: rgba(99,102,241,0.3);   /* indigo selection — not pink */
+  color: #f1f0ff;
 }
 
 /* ── Utility classes ── */
@@ -255,9 +265,4 @@ img {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-/* ── Japanese decorative patterns ── */
-.pattern-asanoha {
-  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0L40 20L20 40L0 20z' fill='none' stroke='%23ffffff' stroke-width='0.3' opacity='0.04'/%3E%3C/svg%3E");
 }

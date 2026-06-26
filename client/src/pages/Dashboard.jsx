@@ -201,10 +201,10 @@ export default function Dashboard() {
 
       {boards.length === 0 ? (
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>🏯</div>
-          <h2 className={styles.emptyTitle}>Your zen garden awaits</h2>
+          <div className={styles.emptyIcon} style={{ fontSize: '2.5rem', opacity: 0.6 }}><IoLayersOutline /></div>
+          <h2 className={styles.emptyTitle}>No boards found</h2>
           <p className={styles.emptySubtitle}>
-            Create your first board to start organizing tasks with the tranquility of a Japanese garden.
+            Create your first project board to start organizing and tracking your team's tasks.
           </p>
         </div>
       ) : (

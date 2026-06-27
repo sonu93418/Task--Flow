@@ -9,61 +9,49 @@ import ThemeToggle from '../components/UI/ThemeToggle';
 import styles from './Landing.module.css';
 import logoSvg from '../assets/logo.svg';
 import workflowDemo from '../assets/workflow_demo.webp';
+import stepCreateBoard from '../assets/step_create_board.png';
+import stepOrganizeTasks from '../assets/step_organize_tasks.png';
+import stepShipAi from '../assets/step_ship_ai.png';
 
 const FEATURES = [
   {
     icon: <IoLayersOutline />,
-    title: 'Kanban Boards',
-    desc: 'Visualize your workflow across To Do, In Progress, and Done. Drag and drop tasks with fluid, real-time updates.',
+    title: 'Fluid Kanban Boards',
+    desc: 'Visualize your sprints across custom workflows. Drag and drop tasks with high-fidelity, real-time visual feedback.',
     color: '#6366f1'
   },
   {
     icon: <IoSparkles />,
-    title: 'AI Effort Estimation',
-    desc: 'Powered by Google Gemini. Analyze task complexity and receive instant effort sizing, hour estimates, and due date recommendations.',
+    title: 'Gemini AI Sizing',
+    desc: 'Get instant, context-aware effort estimates, complexity mapping, and hour projections powered by Google Gemini.',
     color: '#e879a0'
   },
   {
     icon: <IoBarChartOutline />,
-    title: 'Progress Analytics',
-    desc: 'Track velocity, completion rates, and workload distribution with clear, actionable charts built directly into your dashboard.',
+    title: 'Velocity Analytics',
+    desc: 'Track workspace completion velocity and project load metrics with clean, interactive charts rendered in real time.',
     color: '#10b981'
-  },
-  {
-    icon: <IoShieldCheckmark />,
-    title: 'Secure by Default',
-    desc: 'JWT-based authentication with bcrypt password hashing. Your data is private, scoped, and never shared.',
-    color: '#f59e0b'
-  },
-  {
-    icon: <IoCalendarOutline />,
-    title: 'Deadline Management',
-    desc: 'Assign due dates, receive overdue alerts, and filter tasks by priority or status to stay ahead of every deadline.',
-    color: '#8b5cf6'
-  },
-  {
-    icon: <IoPeopleOutline />,
-    title: 'Multi-Project Workspace',
-    desc: 'Manage unlimited boards from a single unified dashboard. Each board is fully independent with its own tasks and analytics.',
-    color: '#06b6d4'
   }
 ];
 
 const STEPS = [
   {
     num: '01',
+    image: stepCreateBoard,
     title: 'Create a Board',
-    desc: 'Sign up and create a project board in under 30 seconds. Name it, set a description, and your workspace is ready.',
+    desc: 'Sign up and build your workspace in under 30 seconds. Define your project scope and organize your sprints instantly.',
   },
   {
     num: '02',
-    title: 'Add and Organize Tasks',
-    desc: 'Create tasks with titles, descriptions, priorities, and deadlines. Move them across columns as work progresses.',
+    image: stepOrganizeTasks,
+    title: 'Organize Tasks',
+    desc: 'Create, edit, and track tasks dynamically on your Kanban board. Customize priorities, assign dates, and drag items smoothly.',
   },
   {
     num: '03',
-    title: 'Ship with Confidence',
-    desc: 'Use AI suggestions for accurate effort estimates. Track progress with real-time analytics and hit every deadline.',
+    image: stepShipAi,
+    title: 'Ship with AI Sizing',
+    desc: 'Leverage Gemini AI estimation models to dynamically size tasks, calibrate development hours, and hit deadlines with confidence.',
   }
 ];
 
@@ -74,27 +62,6 @@ const TECH = [
   { name: 'Gemini AI', icon: <IoSparkles /> },
   { name: 'JWT Auth', icon: <IoShieldCheckmark /> },
   { name: 'Express.js', icon: <IoColorPaletteOutline /> },
-];
-
-const TESTIMONIALS = [
-  {
-    text: "TaskFlow cut our sprint planning time in half. The AI estimation feature is genuinely accurate — it accounts for complexity in a way manual estimation never does.",
-    name: "Arjun Mehta",
-    role: "Engineering Lead",
-    stars: 5
-  },
-  {
-    text: "Clean interface, solid architecture, and the kanban drag-and-drop is buttery smooth. This is what modern project tooling should look like.",
-    name: "Priya Sharma",
-    role: "Product Designer",
-    stars: 5
-  },
-  {
-    text: "Deployed in minutes. The REST API is well-structured and the auth flow is production-ready out of the box. Exactly what I needed.",
-    name: "Rohan Gupta",
-    role: "Startup Founder",
-    stars: 5
-  }
 ];
 
 export default function Landing() {
@@ -111,7 +78,7 @@ export default function Landing() {
           <div className={styles.navLinks}>
             <a href="#features" className={styles.navLink}>Features</a>
             <a href="#how-it-works" className={styles.navLink}>How It Works</a>
-            <a href="#tech" className={styles.navLink}>Tech Stack</a>
+            <a href="#tech" className={styles.navLink}>Architecture</a>
           </div>
           <div className={styles.navActions}>
             <ThemeToggle />
@@ -179,36 +146,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── STATS BAR ── */}
-      <div className={styles.statsBar}>
-        <div className={styles.statsBarInner}>
-          <div className={styles.statsBarItem}>
-            <div className={styles.statsBarNum} style={{color:'#6366f1'}}>14</div>
-            <div className={styles.statsBarLabel}>REST Endpoints</div>
-          </div>
-          <div className={styles.statsBarDivider} />
-          <div className={styles.statsBarItem}>
-            <div className={styles.statsBarNum} style={{color:'#14b8a6'}}>3</div>
-            <div className={styles.statsBarLabel}>Kanban Columns</div>
-          </div>
-          <div className={styles.statsBarDivider} />
-          <div className={styles.statsBarItem}>
-            <div className={styles.statsBarNum} style={{color:'#ec4899'}}>AI</div>
-            <div className={styles.statsBarLabel}>Gemini Powered</div>
-          </div>
-          <div className={styles.statsBarDivider} />
-          <div className={styles.statsBarItem}>
-            <div className={styles.statsBarNum} style={{color:'#f97316'}}>∞</div>
-            <div className={styles.statsBarLabel}>Boards & Tasks</div>
-          </div>
-          <div className={styles.statsBarDivider} />
-          <div className={styles.statsBarItem}>
-            <div className={styles.statsBarNum} style={{color:'#f59e0b'}}>JWT</div>
-            <div className={styles.statsBarLabel}>Secure Auth</div>
-          </div>
-        </div>
-      </div>
-
       {/* ── FEATURES ── */}
       <section id="features" className={styles.section}>
         <div className={styles.sectionInner}>
@@ -241,13 +178,18 @@ export default function Landing() {
             Up and Running in <span className={styles.accentUnderlineAmber}>3 Steps</span>
           </h2>
           <p className={styles.sectionSubtitle}>
-            No complex setup. No steep learning curve. Create an account, build a board, and start shipping.
+            A streamlined project workspace designed to get your team building immediately without overhead.
           </p>
           <div className={styles.stepsGrid}>
-            {STEPS.map((step, i) => (
+            {STEPS.map((step) => (
               <div key={step.num} className={styles.stepCard}>
-                <div className={styles.stepNum}>{step.num}</div>
-                <h3 className={styles.stepTitle}>{step.title}</h3>
+                <div className={styles.stepImageWrapper}>
+                  <img src={step.image} className={styles.stepImage} alt={step.title} />
+                </div>
+                <div className={styles.stepHeader}>
+                  <span className={styles.stepNum}>{step.num}</span>
+                  <h3 className={styles.stepTitle}>{step.title}</h3>
+                </div>
                 <p className={styles.stepDesc}>{step.desc}</p>
               </div>
             ))}
@@ -361,33 +303,6 @@ export default function Landing() {
               <div className={styles.archBoxTitle} style={{color:'#e879a0'}}>AI Layer</div>
               <div className={styles.archBoxItems}>Google Gemini API · gemini-2.0-flash · Structured JSON output · Prompt engineering</div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ── */}
-      <section className={styles.sectionAlt}>
-        <div className={styles.sectionInner}>
-          <div className={`${styles.sectionTag} ${styles.sectionTagCoral}`}>Testimonials</div>
-          <h2 className={styles.sectionTitle}>
-            Trusted by <span className={styles.accentUnderlineCoral}>Developers & Teams</span>
-          </h2>
-          <div className={styles.testimonialsGrid}>
-            {TESTIMONIALS.map(t => (
-              <div key={t.name} className={styles.testimonialCard}>
-                <div className={styles.testimonialStars}>
-                  {Array(t.stars).fill(0).map((_, i) => <IoStar key={i} style={{color:'#f59e0b'}} />)}
-                </div>
-                <p className={styles.testimonialText}>"{t.text}"</p>
-                <div className={styles.testimonialAuthor}>
-                  <div className={styles.testimonialAvatar}>{t.name[0]}</div>
-                  <div>
-                    <div className={styles.testimonialName}>{t.name}</div>
-                    <div className={styles.testimonialRole}>{t.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>

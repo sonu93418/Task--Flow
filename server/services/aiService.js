@@ -26,16 +26,33 @@ const MODELS_TO_TRY = [
 ];
 
 const tryGenerateWithModel = async (ai, model, prompt) => {
-  const response = await ai.models.generateContent({ model, contents: prompt });
+  const response = await ai.models.generateContent({
+    model,
+    contents: prompt,
+    config: {
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: 'OBJECT',
+        properties: {
+          effort: { type: 'STRING', description: 'Effort size: S, M, or L' },
+          estimatedHours: { type: 'INTEGER', description: 'Estimated hours to complete' },
+          suggestedDueDate: { type: 'STRING', description: 'Suggested due date in YYYY-MM-DD format' },
+          reasoning: { type: 'STRING', description: 'Brief reasoning for the estimate' }
+        },
+        required: ['effort', 'estimatedHours', 'suggestedDueDate', 'reasoning']
+      }
+    }
+  });
   return response.text.trim();
 };
 
 export const getAISuggestion = async (title, description) => {
-  if (!process.env.GEMINI_API_KEY) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
     return getMockSuggestion(title, 'no API key configured');
   }
 
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const ai = new GoogleGenAI({ apiKey });
 
   const today = new Date().toISOString().split('T')[0];
   const prompt = `You are a project management assistant. Given the following task, estimate the effort required.
@@ -44,13 +61,7 @@ Task Title: ${title}
 Task Description: ${description || 'No description provided'}
 Today's Date: ${today}
 
-Respond ONLY with valid JSON (no markdown, no code fences, no extra text):
-{
-  "effort": "S or M or L",
-  "estimatedHours": <number between 1 and 40>,
-  "suggestedDueDate": "<YYYY-MM-DD format>",
-  "reasoning": "<1-2 sentence explanation>"
-}`;
+Respond with the effort size (S, M, or L), estimated hours, a suggested due date in YYYY-MM-DD format, and a brief reasoning.`;
 
   let lastError = null;
 

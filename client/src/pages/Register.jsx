@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   IoPersonOutline, IoMailOutline, IoLockClosedOutline,
   IoAlertCircle, IoEyeOutline, IoEyeOffOutline, IoLogoGoogle, IoLogoGithub
@@ -17,9 +17,19 @@ export default function Register() {
   const [showPwd, setShowPwd]         = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading]         = useState(false);
-  const [error, setError]             = useState('');
+  const [searchParams]                = useSearchParams();
+  const [error, setError]             = useState(searchParams.get('error') || '');
   const { register }                  = useAuth();
   const navigate                      = useNavigate();
+
+  useEffect(() => {
+    const errParam = searchParams.get('error');
+    if (errParam) {
+      setError(errParam);
+    }
+  }, [searchParams]);
+
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -224,7 +234,7 @@ export default function Register() {
               <button
                 type="button"
                 className={styles.socialButton}
-                onClick={() => alert('Demo Google Signup')}
+                onClick={() => { window.location.href = `${API_BASE}/auth/google?action=register`; }}
               >
                 <IoLogoGoogle className={styles.googleIcon} />
                 <span>Sign up with Google</span>
@@ -232,7 +242,7 @@ export default function Register() {
               <button
                 type="button"
                 className={styles.socialButton}
-                onClick={() => alert('Demo GitHub Signup')}
+                onClick={() => { window.location.href = `${API_BASE}/auth/github?action=register`; }}
               >
                 <IoLogoGithub className={styles.githubIcon} />
                 <span>Sign up with GitHub</span>

@@ -54,7 +54,7 @@ export const login = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password.'
+        message: 'Account not found. Please register first.'
       });
     }
 

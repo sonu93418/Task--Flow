@@ -1,233 +1,335 @@
-# 🌸 TaskFlow — Task & Project Management
+<div align="center">
 
-A beautiful, full-stack Kanban-style task management application with a Japanese-inspired design aesthetic. Built with React, Node.js/Express, and MongoDB.
+# ✅ TaskFlow
 
-![Dashboard Empty State](./screenshots/dashboard.png)
-![Board View with Tasks](./screenshots/board.png)
+**A full-stack Kanban-style task management app powered by AI.**  
+Organize your work into boards, drag tasks across columns, and let Google Gemini estimate effort and due dates — all in a clean, responsive UI with dark mode support.
+
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev)
+[![Express](https://img.shields.io/badge/Express-4-000000?logo=express)](https://expressjs.com)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?logo=mongodb)](https://mongoosejs.com)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite)](https://vite.dev)
+[![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-4285F4?logo=google)](https://aistudio.google.com)
+
+</div>
+
+---
+
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td align="center"><strong>Landing Page</strong></td>
+    <td align="center"><strong>Login Page</strong></td>
+  </tr>
+  <tr>
+    <td><img src="client/src/assets/landing page.png" alt="Landing Page" width="100%" /></td>
+    <td><img src="client/src/assets/login page.png" alt="Login Page" width="100%" /></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Dashboard</strong></td>
+    <td align="center"><strong>Mobile View</strong></td>
+  </tr>
+  <tr>
+    <td><img src="client/src/assets/Dasboard.png" alt="Dashboard" width="100%" /></td>
+    <td><img src="client/src/assets/mobile view.png" alt="Mobile View" width="100%" /></td>
+  </tr>
+</table>
+
+---
 
 ## ✨ Features
 
-### Core
-- **Authentication** — Register, login, JWT-based sessions, protected routes
-- **Board Management** — Create, rename, delete boards with confirmation prompts
-- **Task Management** — Full CRUD with status, priority, due dates, and effort estimates
-- **Kanban Board** — Three-column layout (To Do, In Progress, Done) with drag-and-drop
-- **AI Effort Estimation** — Smart due-date and effort suggestions powered by Google Gemini API
+- **Kanban Boards** — Create multiple boards, each with `Todo`, `In Progress`, and `Done` columns
+- **Drag & Drop** — Reorder tasks within and across columns using `@dnd-kit`
+- **AI Estimates** — One-click AI suggestion for effort size (S/M/L), estimated hours, and a suggested due date via Google Gemini
+- **Task Details** — Title, description, priority (low/medium/high), due date, and effort tracking
+- **Auth** — Email/password sign-up + OAuth via Google and GitHub
+- **Dark / Light Mode** — System-aware theme toggle persisted across sessions
+- **Progress Charts** — Per-board task completion stats powered by Recharts
+- **Responsive Design** — Fully usable on mobile, tablet, and desktop
 
-### Bonus
-- 🎨 **Dark / Light Mode** — Toggle with persisted preference
-- 📊 **Dashboard Analytics** — Charts showing tasks by status and priority (Recharts)
-- 🔍 **Search & Filters** — Search tasks, filter by priority, sort by due date/priority
-- 🖱️ **Drag & Drop** — Move tasks between columns with @dnd-kit
-- ⚠️ **Overdue Indicators** — Visual cues for past-due tasks
-- 📱 **Fully Responsive** — Works on mobile, tablet, and desktop
-- 🏯 **Japanese Theme** — Sakura, indigo, matcha color palette with Noto Serif JP typography
-- ✅ **Input Validation** — Joi on backend, inline on frontend
-- 🔔 **Toast Notifications** — Success/error feedback for all actions
-- 💀 **Loading Skeletons** — Shimmer placeholders while data loads
-- 🚫 **Custom 404 Page** — Themed "path leads nowhere" page
+---
 
-## 🛠 Tech Stack
-
-| Layer | Technology |
-|---|---|
-| **Frontend** | React 18, Vite, React Router v6, CSS Modules |
-| **Backend** | Node.js, Express.js |
-| **Database** | MongoDB (Mongoose ODM) — Atlas hosted |
-| **Auth** | JWT (jsonwebtoken) + bcryptjs |
-| **HTTP Client** | Axios |
-| **AI** | Google Gemini API (`@google/genai` — `gemini-2.0-flash`) |
-| **Drag & Drop** | @dnd-kit/core + @dnd-kit/sortable |
-| **Charts** | Recharts |
-| **Validation** | Joi |
-| **Icons** | react-icons (Ionicons) |
-| **Fonts** | Inter + Noto Serif JP (Google Fonts) |
-
-### Why Google Gemini API?
-- Generous free tier with no credit card required
-- Fast inference with `gemini-2.0-flash` model
-- Simple SDK (`@google/genai`) for Node.js
-- Reliable structured JSON output for effort estimation
-
-## 📂 Project Structure
+## 🗂️ Project Structure
 
 ```
 Task-Flow/
-├── client/                     # React frontend (Vite)
+├── client/                         # React frontend (Vite)
+│   ├── public/                     # Static assets (favicon, images)
 │   ├── src/
-│   │   ├── api/                # Axios instance & API services
-│   │   ├── components/         # Reusable components
-│   │   │   ├── Auth/           # ProtectedRoute
-│   │   │   ├── Board/          # Board-specific components
-│   │   │   ├── Layout/         # Navbar, Sidebar, Layout
-│   │   │   ├── Task/           # TaskModal
-│   │   │   └── UI/             # Modal, Toast, Skeleton, etc.
-│   │   ├── context/            # AuthContext, ThemeContext
-│   │   ├── hooks/              # useAuth, useTheme
-│   │   ├── pages/              # Login, Register, Dashboard, BoardView, NotFound
-│   │   └── index.css           # Design system (CSS custom properties)
+│   │   ├── api/                    # Axios API call modules
+│   │   │   ├── ai.js               # AI suggestion endpoint
+│   │   │   ├── auth.js             # Auth (login, register, OAuth)
+│   │   │   ├── axios.js            # Axios instance with base URL & interceptors
+│   │   │   ├── boards.js           # Board CRUD calls
+│   │   │   └── tasks.js            # Task CRUD calls
+│   │   ├── assets/                 # Images and SVGs
+│   │   ├── components/
+│   │   │   ├── Auth/
+│   │   │   │   └── ProtectedRoute.jsx
+│   │   │   ├── Layout/
+│   │   │   │   ├── Layout.jsx      # App shell with sidebar + navbar
+│   │   │   │   ├── Navbar.jsx
+│   │   │   │   └── Sidebar.jsx
+│   │   │   ├── Task/
+│   │   │   │   └── TaskModal.jsx   # Create / edit task modal with AI button
+│   │   │   └── UI/
+│   │   │       ├── ConfirmDialog.jsx
+│   │   │       ├── Modal.jsx
+│   │   │       ├── Skeleton.jsx
+│   │   │       ├── ThemeToggle.jsx
+│   │   │       └── Toast.jsx
+│   │   ├── context/
+│   │   │   ├── AuthContext.jsx     # Global auth state
+│   │   │   └── ThemeContext.jsx    # Global theme state
+│   │   ├── hooks/
+│   │   │   ├── useAuth.js
+│   │   │   └── useTheme.js
+│   │   ├── pages/
+│   │   │   ├── Landing.jsx         # Public marketing page
+│   │   │   ├── Login.jsx
+│   │   │   ├── Register.jsx
+│   │   │   ├── Dashboard.jsx       # Board list + stats
+│   │   │   ├── BoardView.jsx       # Kanban board with drag & drop
+│   │   │   ├── OAuthCallback.jsx   # Handles OAuth redirect token
+│   │   │   └── NotFound.jsx
+│   │   ├── App.jsx                 # Router and provider composition
+│   │   ├── main.jsx
+│   │   └── index.css               # Global CSS variables + base styles
+│   ├── index.html
+│   ├── vite.config.js
 │   └── package.json
 │
-├── server/                     # Express backend
-│   ├── config/                 # Database connection
-│   ├── controllers/            # Route handlers
-│   ├── middleware/              # Auth, error handler, validation
-│   ├── models/                 # Mongoose schemas (User, Board, Task)
-│   ├── routes/                 # Express route definitions
-│   ├── services/               # AI service (Gemini + mock fallback)
-│   ├── validators/             # Joi validation schemas
-│   ├── server.js               # Entry point
+├── server/                         # Express backend (Node.js)
+│   ├── config/
+│   │   ├── db.js                   # MongoDB connection via Mongoose
+│   │   └── passport.js             # Google & GitHub OAuth strategies
+│   ├── controllers/
+│   │   ├── aiController.js         # POST /api/ai/suggest
+│   │   ├── authController.js       # Register, login, OAuth handlers
+│   │   ├── boardController.js      # Board CRUD
+│   │   └── taskController.js       # Task CRUD + drag-and-drop reorder
+│   ├── middleware/
+│   │   ├── auth.js                 # JWT verification middleware
+│   │   ├── errorHandler.js         # Global error handler
+│   │   └── validate.js             # Joi request validation
+│   ├── models/
+│   │   ├── User.js                 # User schema (local + OAuth)
+│   │   ├── Board.js                # Board schema
+│   │   └── Task.js                 # Task schema (status, priority, effort)
+│   ├── routes/
+│   │   ├── aiRoutes.js
+│   │   ├── authRoutes.js
+│   │   ├── boardRoutes.js
+│   │   └── taskRoutes.js
+│   ├── services/
+│   │   └── aiService.js            # Google Gemini integration + fallback
+│   ├── validators/                 # Joi validation schemas
+│   ├── server.js                   # Express app entry point
+│   ├── .env.example
 │   └── package.json
 │
-├── .gitignore
 └── README.md
 ```
 
-## 🚀 Setup & Run Locally
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+| Tool | Purpose |
+|---|---|
+| [React 19](https://react.dev) | UI framework |
+| [Vite 8](https://vite.dev) | Build tool & dev server |
+| [React Router v7](https://reactrouter.com) | Client-side routing |
+| [@dnd-kit](https://dndkit.com) | Drag-and-drop for Kanban columns |
+| [Recharts](https://recharts.org) | Task progress charts on dashboard |
+| [Axios](https://axios-http.com) | HTTP client for API calls |
+| [React Icons](https://react-icons.github.io/react-icons) | Icon library |
+| [canvas-confetti](https://github.com/catdad/canvas-confetti) | Celebration animation on task completion |
+| CSS Modules | Scoped component styles |
+
+### Backend
+| Tool | Purpose |
+|---|---|
+| [Node.js](https://nodejs.org) | Runtime |
+| [Express 4](https://expressjs.com) | REST API framework |
+| [MongoDB](https://mongodb.com) + [Mongoose](https://mongoosejs.com) | Database & ODM |
+| [JWT](https://jwt.io) (`jsonwebtoken`) | Stateless authentication |
+| [bcryptjs](https://github.com/dcodeIO/bcrypt.js) | Password hashing |
+| [Passport.js](https://passportjs.org) | OAuth2 strategies (Google, GitHub) |
+| [Joi](https://joi.dev) | Request validation |
+| [@google/genai](https://googleapis.dev/nodejs/google-gax) | Google Gemini AI SDK |
+| [dotenv](https://github.com/motdotla/dotenv) | Environment variable loading |
+
+### Database
+- **MongoDB Atlas** (or local MongoDB) — stores Users, Boards, and Tasks
+
+---
+
+## 🤖 AI Feature — Google Gemini
+
+### Why Gemini?
+Google Gemini (via `@google/genai`) was chosen for its:
+- **Structured JSON output** — the SDK supports `responseMimeType: 'application/json'` and a `responseSchema`, so the response is directly parseable without regex hacks
+- **Free tier availability** — Gemini 1.5 Flash and 2.0 Flash are available on the free tier at [aistudio.google.com](https://aistudio.google.com), making it easy to get started without a billing account
+- **Model fallback chain** — the service tries `gemini-2.0-flash` → `gemini-1.5-flash` → `gemini-1.5-flash-8b` automatically on quota errors
+
+### How it works
+1. User opens the **Task Modal** and clicks **"AI Suggest"**
+2. The frontend sends `POST /api/ai/suggest` with the task `title` and `description`
+3. The server builds a prompt and calls the Gemini API, requesting a structured JSON response with:
+   - `effort` — `S`, `M`, or `L` (Small / Medium / Large)
+   - `estimatedHours` — integer
+   - `suggestedDueDate` — `YYYY-MM-DD`
+   - `reasoning` — a brief explanation
+4. The response is validated and sanitized, then returned to the frontend
+5. The modal auto-fills the effort and due date fields — the user can accept or edit them before saving
+6. If the API key is missing or all models hit quota limits, a **fallback mock estimate** is returned based on task title length, so the app never hard-fails
+
+---
+
+## ⚙️ Local Setup
 
 ### Prerequisites
-- Node.js v18+
-- npm or yarn
-- MongoDB Atlas account (or local MongoDB)
-- Google Gemini API key (optional — app works without it)
+- [Node.js](https://nodejs.org) v18 or later
+- [npm](https://npmjs.com) v9 or later
+- A [MongoDB Atlas](https://cloud.mongodb.com) cluster (free tier works) or local MongoDB
+- A [Gemini API key](https://aistudio.google.com/app/apikey) (free, no billing required)
+- Google and/or GitHub OAuth app credentials (optional — only needed for social login)
+
+---
 
 ### 1. Clone the repository
+
 ```bash
-git clone https://github.com/your-username/Task-Flow.git
-cd Task-Flow
+git clone https://github.com/your-username/task-flow.git
+cd task-flow
 ```
 
-### 2. Backend setup
+---
+
+### 2. Set up the backend
+
 ```bash
 cd server
 npm install
+```
 
-# Create .env from template
+Create your `.env` file by copying the example:
+
+```bash
 cp .env.example .env
-# Edit .env with your values (see Environment Variables below)
+```
 
-# Start the server
+Then open `server/.env` and fill in your values:
+
+```env
+# MongoDB connection string
+MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/taskflow
+
+# JWT — use a long random string
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRES_IN=7d
+
+# Google Gemini API key — get one free at https://aistudio.google.com/app/apikey
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# OAuth — Google (https://console.cloud.google.com/apis/credentials)
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# OAuth — GitHub (https://github.com/settings/developers)
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+
+# Must match the Vite dev server port
+CLIENT_URL=http://localhost:5173
+
+# Session secret for the OAuth handshake (any random string)
+SESSION_SECRET=your_session_secret_here
+```
+
+> **OAuth is optional.** If you skip the Google/GitHub credentials, email/password login and all other features still work normally.
+
+Start the backend:
+
+```bash
 npm run dev
 ```
 
-### 3. Frontend setup
+The API will be available at `http://localhost:5000/api`.  
+Test it: `http://localhost:5000/api/health` should return `{ "success": true }`.
+
+---
+
+### 3. Set up the frontend
+
+Open a new terminal:
+
 ```bash
 cd client
 npm install
-
-# Start the dev server
 npm run dev
 ```
 
-The app will be running at:
-- **Frontend:** http://localhost:5173
-- **Backend:** http://localhost:5000
+The app will open at **`http://localhost:5173`**.
 
-### Environment Variables
+> Vite is configured to proxy all `/api` requests to `http://localhost:5000`, so no extra CORS config is needed during development.
 
-Create a `.env` file in the `server/` directory:
+---
 
-```env
-MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/taskflow
-JWT_SECRET=your_jwt_secret_key_here
-JWT_EXPIRES_IN=7d
-GEMINI_API_KEY=your_gemini_api_key_here    # Optional
-PORT=5000
-```
+### 4. OAuth redirect URIs (optional)
+
+If you enable Google or GitHub login, add these **Authorized Redirect URIs** in your OAuth app settings:
+
+| Provider | Redirect URI |
+|---|---|
+| Google | `http://localhost:5000/api/auth/google/callback` |
+| GitHub | `http://localhost:5000/api/auth/github/callback` |
+
+---
+
+## 🔑 Environment Variables Reference
 
 | Variable | Required | Description |
 |---|---|---|
 | `MONGODB_URI` | ✅ | MongoDB connection string |
-| `JWT_SECRET` | ✅ | Secret key for JWT signing |
-| `JWT_EXPIRES_IN` | ❌ | Token expiration (default: 7d) |
-| `GEMINI_API_KEY` | ❌ | Google Gemini API key for AI features |
-| `PORT` | ❌ | Server port (default: 5000) |
+| `JWT_SECRET` | ✅ | Secret key for signing JWT tokens |
+| `JWT_EXPIRES_IN` | ✅ | Token expiry (e.g. `7d`) |
+| `GEMINI_API_KEY` | ✅ | Google Gemini API key for AI estimates |
+| `CLIENT_URL` | ✅ | Frontend origin for OAuth redirects |
+| `SESSION_SECRET` | ✅ | Session secret for Passport OAuth handshake |
+| `GOOGLE_CLIENT_ID` | ⬜ | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | ⬜ | Google OAuth client secret |
+| `GITHUB_CLIENT_ID` | ⬜ | GitHub OAuth client ID |
+| `GITHUB_CLIENT_SECRET` | ⬜ | GitHub OAuth client secret |
 
-## 🤖 AI Feature — Smart Effort Estimation
+---
 
-When creating or editing a task, click the **"Suggest"** button to get an AI-powered estimate:
+## 📡 API Endpoints
 
-1. The frontend sends the task title and description to `POST /api/ai/suggest`
-2. The backend calls the Google Gemini API with a structured prompt
-3. The AI returns: **effort size (S/M/L)**, **estimated hours**, **suggested due date**, and **reasoning**
-4. The user can **accept** (pre-fills the form) or **dismiss** the suggestion
-
-**Fallback:** If the `GEMINI_API_KEY` is not set or the API fails, a mock estimate is returned based on task title length. The app remains fully functional without AI.
-
-## 📡 API Documentation
-
-### Auth Endpoints
-| Method | Path | Purpose | Auth |
+| Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| POST | `/api/auth/register` | Create account | ❌ |
-| POST | `/api/auth/login` | Login, get JWT | ❌ |
-| GET | `/api/auth/me` | Get current user | ✅ |
+| `GET` | `/api/health` | — | Health check |
+| `POST` | `/api/auth/register` | — | Create account |
+| `POST` | `/api/auth/login` | — | Login with email/password |
+| `GET` | `/api/auth/google` | — | Start Google OAuth flow |
+| `GET` | `/api/auth/github` | — | Start GitHub OAuth flow |
+| `GET` | `/api/auth/me` | JWT | Get current user |
+| `GET` | `/api/boards` | JWT | List all boards |
+| `POST` | `/api/boards` | JWT | Create a board |
+| `PUT` | `/api/boards/:id` | JWT | Update a board |
+| `DELETE` | `/api/boards/:id` | JWT | Delete a board + its tasks |
+| `GET` | `/api/boards/:id/tasks` | JWT | List tasks for a board |
+| `POST` | `/api/boards/:id/tasks` | JWT | Create a task |
+| `PUT` | `/api/boards/:id/tasks/:taskId` | JWT | Update a task |
+| `DELETE` | `/api/boards/:id/tasks/:taskId` | JWT | Delete a task |
+| `POST` | `/api/ai/suggest` | JWT | Get AI effort estimate |
 
-### Board Endpoints
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| GET | `/api/boards` | List user's boards | ✅ |
-| POST | `/api/boards` | Create board | ✅ |
-| GET | `/api/boards/:id` | Get single board | ✅ |
-| PUT | `/api/boards/:id` | Update board | ✅ |
-| DELETE | `/api/boards/:id` | Delete board + tasks | ✅ |
-
-### Task Endpoints
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| GET | `/api/boards/:boardId/tasks` | List tasks (with filters) | ✅ |
-| POST | `/api/boards/:boardId/tasks` | Create task | ✅ |
-| GET | `/api/boards/:boardId/tasks/:id` | Get single task | ✅ |
-| PUT | `/api/boards/:boardId/tasks/:id` | Update task | ✅ |
-| DELETE | `/api/boards/:boardId/tasks/:id` | Delete task | ✅ |
-| PATCH | `/api/boards/:boardId/tasks/:id/move` | Move task (status + position) | ✅ |
-
-### AI Endpoint
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| POST | `/api/ai/suggest` | Get AI effort estimate | ✅ |
-
-**Query Parameters** for `GET /api/boards/:boardId/tasks`:
-- `status` — Filter by status (`todo`, `in-progress`, `done`)
-- `priority` — Filter by priority (`low`, `medium`, `high`)
-- `sort` — Sort by (`dueDate`, `priority`, `created`)
-- `search` — Search title and description
-
-## 🎨 Design Theme
-
-The app uses a **Japanese/Japandi-inspired** design language:
-- **Sakura (桜)** — Cherry blossom pink for accents and CTAs
-- **Ai (藍)** — Traditional indigo for primary actions
-- **Matcha (抹茶)** — Green for success and completion states
-- **Sumi (墨)** — Ink-dark backgrounds
-- **Kinari (生成り)** — Natural cream for light mode
-- **Kitsune (狐)** — Amber/rust for warnings and in-progress states
-- **Ume (梅)** — Plum red for danger and high priority
-
-Typography: **Inter** (sans-serif) for UI + **Noto Serif JP** for headings.
-
-## ⚠️ Known Issues / Limitations
-
-- Drag-and-drop works within same column; cross-column drag may require a page refresh for position accuracy
-- AI suggestions depend on Gemini API availability and free tier rate limits
-- No real-time collaboration (single-user boards only)
-- No image/file attachments on tasks
-- No password reset / forgot password flow
-
-## 🔮 Future Improvements
-
-- Real-time updates with WebSockets
-- Board sharing / collaboration
-- Subtask support and task dependencies
-- File attachments and rich text descriptions
-- Activity log / audit trail
-- Email notifications for due dates
-- PWA support for offline access
-- Docker setup for deployment
-- Comprehensive test suite (Jest + Supertest + RTL)
+---
 
 ## 📄 License
 
-MIT
-#   T a s k - - F l o w  
- 
+MIT — feel free to use, fork, and build on this project.

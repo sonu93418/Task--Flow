@@ -133,6 +133,7 @@ export default function Landing() {
 
         {/* Hero mockup */}
         <div className={styles.heroMockup}>
+          <div className={styles.mockup3DWrapper}>
           <div className={styles.decorOrbTopLeft} />
           <div className={styles.decorOrbBottomRight} />
           <div className={styles.decorSunburstBottomLeft}>
@@ -171,6 +172,7 @@ export default function Landing() {
             </div>
             <div className={styles.mockupVideoWrapper}>
               <img src={workflowDemo} className={styles.mockupVideo} alt="TaskFlow Workflow Demo" />
+            </div>
             </div>
           </div>
         </div>

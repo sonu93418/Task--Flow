@@ -8,7 +8,7 @@ import User from '../models/User.js';
  * If a user with the same email exists (e.g. registered locally),
  * we link the OAuth provider to that existing account.
  */
-async function findOrCreateOAuthUser(provider, profile) {
+async function handleOAuthUser(provider, profile, action) {
   const providerId = profile.id;
   const email = profile.emails?.[0]?.value?.toLowerCase();
   const name = profile.displayName || profile.username || email?.split('@')[0] || 'User';
@@ -16,27 +16,30 @@ async function findOrCreateOAuthUser(provider, profile) {
 
   // 1. Check if this exact OAuth account already exists
   let user = await User.findOne({ provider, providerId });
-  if (user) {
-    if (avatar && user.avatar !== avatar) {
-      user.avatar = avatar;
-      await user.save();
-    }
-    return user;
-  }
-
-  // 2. Check if a user with the same email exists (e.g. local signup)
-  if (email) {
+  
+  if (!user && email) {
+    // 2. Check if a user with the same email exists (e.g. local signup)
     user = await User.findOne({ email });
     if (user) {
       user.provider = provider;
       user.providerId = providerId;
-      if (avatar) user.avatar = avatar;
-      await user.save();
-      return user;
     }
   }
 
-  // 3. Create a brand-new user
+  if (user) {
+    if (avatar && user.avatar !== avatar) {
+      user.avatar = avatar;
+    }
+    await user.save();
+    return user;
+  }
+
+  // User does not exist
+  if (action === 'login') {
+    throw new Error('Account not found. Please register first.');
+  }
+
+  // 3. Create a brand-new user for 'register' action
   user = await User.create({
     name,
     email: email || `${provider}_${providerId}@taskflow.local`,
@@ -67,10 +70,12 @@ export default function configurePassport() {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: '/api/auth/google/callback',
-      scope: ['profile', 'email']
-    }, async (_accessToken, _refreshToken, profile, done) => {
+      scope: ['profile', 'email'],
+      passReqToCallback: true
+    }, async (req, _accessToken, _refreshToken, profile, done) => {
       try {
-        const user = await findOrCreateOAuthUser('google', profile);
+        const action = req.session.authAction || 'login';
+        const user = await handleOAuthUser('google', profile, action);
         done(null, user);
       } catch (err) {
         done(err, null);
@@ -87,10 +92,12 @@ export default function configurePassport() {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       callbackURL: '/api/auth/github/callback',
-      scope: ['user:email']
-    }, async (_accessToken, _refreshToken, profile, done) => {
+      scope: ['user:email'],
+      passReqToCallback: true
+    }, async (req, _accessToken, _refreshToken, profile, done) => {
       try {
-        const user = await findOrCreateOAuthUser('github', profile);
+        const action = req.session.authAction || 'login';
+        const user = await handleOAuthUser('github', profile, action);
         done(null, user);
       } catch (err) {
         done(err, null);

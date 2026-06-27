@@ -248,6 +248,19 @@
   width: 100%;
   max-width: 680px;
   overflow: visible;
+  perspective: 1400px;
+}
+
+.mockup3DWrapper {
+  position: relative;
+  width: 100%;
+  transform: rotateY(-12deg) rotateX(4deg) translateZ(40px) translateY(-20px);
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.mockup3DWrapper:hover {
+  transform: rotateY(-4deg) rotateX(2deg) translateZ(80px) translateY(-30px);
 }
 
 .heroMockup::before {
@@ -266,7 +279,11 @@
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg); overflow: hidden;
-  box-shadow: var(--shadow-float);
+  box-shadow: 0 30px 60px -15px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.05);
+  transition: box-shadow 0.6s ease;
+}
+.mockup3DWrapper:hover .mockupWindow {
+  box-shadow: 0 45px 80px -20px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,0,0,0.05);
 }
 .mockupBar {
   display: flex; align-items: center; gap: 0.5rem;

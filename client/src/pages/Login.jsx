@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link as RouterLink, useSearchParams } from 'react-router-dom';
 import {
   IoMailOutline, IoLockClosedOutline, IoAlertCircle,
   IoEyeOutline, IoEyeOffOutline, IoLogoGoogle, IoLogoGithub
@@ -14,9 +14,17 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPwd, setShowPwd]   = useState(false);
   const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
+  const [searchParams]          = useSearchParams();
+  const [error, setError]       = useState(searchParams.get('error') || '');
   const { login }               = useAuth();
   const navigate                = useNavigate();
+
+  useEffect(() => {
+    const errParam = searchParams.get('error');
+    if (errParam) {
+      setError(errParam);
+    }
+  }, [searchParams]);
 
   const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -28,7 +36,11 @@ export default function Login() {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message);
+      if (err.message === 'Account not found. Please register first.') {
+        navigate(`/register?error=${encodeURIComponent(err.message)}`);
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -170,7 +182,7 @@ export default function Login() {
               <button
                 type="button"
                 className={styles.socialButton}
-                onClick={() => { window.location.href = `${API_BASE}/auth/google`; }}
+                onClick={() => { window.location.href = `${API_BASE}/auth/google?action=login`; }}
               >
                 <IoLogoGoogle className={styles.googleIcon} />
                 <span>Login with Google</span>
@@ -178,7 +190,7 @@ export default function Login() {
               <button
                 type="button"
                 className={styles.socialButton}
-                onClick={() => { window.location.href = `${API_BASE}/auth/github`; }}
+                onClick={() => { window.location.href = `${API_BASE}/auth/github?action=login`; }}
               >
                 <IoLogoGithub className={styles.githubIcon} />
                 <span>Login with GitHub</span>

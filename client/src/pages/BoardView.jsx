@@ -26,6 +26,39 @@ import TaskModal from '../components/Task/TaskModal';
 import ConfirmDialog from '../components/UI/ConfirmDialog';
 import Skeleton from '../components/UI/Skeleton';
 import styles from './BoardView.module.css';
+import confetti from 'canvas-confetti';
+
+const triggerConfetti = () => {
+  confetti({
+    particleCount: 80,
+    spread: 60,
+    origin: { y: 0.6 }
+  });
+  
+  const end = Date.now() + 1500;
+  const colors = ['#6366f1', '#e879a0', '#10b981', '#f59e0b'];
+
+  (function frame() {
+    confetti({
+      particleCount: 2,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.8 },
+      colors
+    });
+    confetti({
+      particleCount: 2,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.8 },
+      colors
+    });
+
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  }());
+};
 
 const COLUMNS = [
   { id: 'todo', title: 'To Do', dot: styles.dotTodo },
@@ -222,12 +255,16 @@ export default function BoardView() {
   };
 
   const handleUpdateTask = async (data) => {
+    const originalTask = taskModal.task;
     const res = await updateTask(boardId, taskModal.task._id, data);
     setTasks((prev) =>
       prev.map((t) => (t._id === taskModal.task._id ? res.data.data : t))
     );
     toast.success('Task updated', `"${data.title}" saved`);
     fetchBoards();
+    if (originalTask && originalTask.status !== 'done' && data.status === 'done') {
+      triggerConfetti();
+    }
   };
 
   const handleDeleteTask = async () => {
@@ -307,6 +344,9 @@ export default function BoardView() {
       const res = await getTasks(boardId);
       setTasks(res.data.data);
       fetchBoards();
+      if (task && task.status !== 'done' && targetColumn === 'done') {
+        triggerConfetti();
+      }
     } catch {
       toast.error('Error', 'Failed to move task');
       setTasks(tasksSnapshot.current);

@@ -132,6 +132,35 @@ export default function Landing() {
 
         {/* Hero mockup */}
         <div className={styles.heroMockup}>
+          <div className={styles.decorOrbTopLeft} />
+          <div className={styles.decorOrbBottomRight} />
+          <div className={styles.decorSunburstBottomLeft}>
+            <svg viewBox="0 0 100 100" className={styles.sunburstSvg}>
+              <circle cx="50" cy="50" r="14" fill="var(--kitsune)" />
+              <rect x="46" y="10" width="8" height="24" rx="4" fill="var(--kitsune)" />
+              <rect x="46" y="66" width="8" height="24" rx="4" fill="var(--kitsune)" />
+              <rect x="10" y="46" width="24" height="8" rx="4" fill="var(--kitsune)" />
+              <rect x="66" y="46" width="24" height="8" rx="4" fill="var(--kitsune)" />
+              <g transform="rotate(45 50 50)">
+                <rect x="46" y="10" width="8" height="24" rx="4" fill="var(--kitsune)" />
+                <rect x="46" y="66" width="8" height="24" rx="4" fill="var(--kitsune)" />
+                <rect x="10" y="46" width="24" height="8" rx="4" fill="var(--kitsune)" />
+                <rect x="66" y="46" width="24" height="8" rx="4" fill="var(--kitsune)" />
+              </g>
+              <g transform="rotate(22.5 50 50)">
+                <rect x="47" y="15" width="6" height="18" rx="3" fill="var(--kitsune)" />
+                <rect x="47" y="67" width="6" height="18" rx="3" fill="var(--kitsune)" />
+                <rect x="15" y="47" width="18" height="6" rx="3" fill="var(--kitsune)" />
+                <rect x="67" y="47" width="18" height="6" rx="3" fill="var(--kitsune)" />
+              </g>
+              <g transform="rotate(67.5 50 50)">
+                <rect x="47" y="15" width="6" height="18" rx="3" fill="var(--kitsune)" />
+                <rect x="47" y="67" width="6" height="18" rx="3" fill="var(--kitsune)" />
+                <rect x="15" y="47" width="18" height="6" rx="3" fill="var(--kitsune)" />
+                <rect x="67" y="47" width="18" height="6" rx="3" fill="var(--kitsune)" />
+              </g>
+            </svg>
+          </div>
           <div className={styles.mockupWindow}>
             <div className={styles.mockupBar}>
               <span className={styles.mockupDot} style={{background:'#ff5f57'}} />
@@ -233,36 +262,67 @@ export default function Landing() {
             </div>
             <div className={styles.aiRight}>
               <div className={styles.aiMockup}>
-                <div className={styles.aiMockupHeader}>
-                  <IoSparkles style={{color:'#e879a0'}} />
-                  <span>AI Analysis — Gemini 2.0 Flash</span>
+                <div className={styles.decorOrbTopLeft} />
+                <div className={styles.decorOrbBottomRight} />
+                <div className={styles.decorSunburstBottomLeft}>
+                  <svg viewBox="0 0 100 100" className={styles.sunburstSvg}>
+                    <circle cx="50" cy="50" r="14" fill="var(--kitsune)" />
+                    <rect x="46" y="10" width="8" height="24" rx="4" fill="var(--kitsune)" />
+                    <rect x="46" y="66" width="8" height="24" rx="4" fill="var(--kitsune)" />
+                    <rect x="10" y="46" width="24" height="8" rx="4" fill="var(--kitsune)" />
+                    <rect x="66" y="46" width="24" height="8" rx="4" fill="var(--kitsune)" />
+                    <g transform="rotate(45 50 50)">
+                      <rect x="46" y="10" width="8" height="24" rx="4" fill="var(--kitsune)" />
+                      <rect x="46" y="66" width="8" height="24" rx="4" fill="var(--kitsune)" />
+                      <rect x="10" y="46" width="24" height="8" rx="4" fill="var(--kitsune)" />
+                      <rect x="66" y="46" width="24" height="8" rx="4" fill="var(--kitsune)" />
+                    </g>
+                    <g transform="rotate(22.5 50 50)">
+                      <rect x="47" y="15" width="6" height="18" rx="3" fill="var(--kitsune)" />
+                      <rect x="47" y="67" width="6" height="18" rx="3" fill="var(--kitsune)" />
+                      <rect x="15" y="47" width="18" height="6" rx="3" fill="var(--kitsune)" />
+                      <rect x="67" y="47" width="18" height="6" rx="3" fill="var(--kitsune)" />
+                    </g>
+                    <g transform="rotate(67.5 50 50)">
+                      <rect x="47" y="15" width="6" height="18" rx="3" fill="var(--kitsune)" />
+                      <rect x="47" y="67" width="6" height="18" rx="3" fill="var(--kitsune)" />
+                      <rect x="15" y="47" width="18" height="6" rx="3" fill="var(--kitsune)" />
+                      <rect x="67" y="47" width="18" height="6" rx="3" fill="var(--kitsune)" />
+                    </g>
+                  </svg>
                 </div>
-                <div className={styles.aiMockupTask}>
-                  <div className={styles.aiMockupLabel}>Task</div>
-                  <div className={styles.aiMockupValue}>"Implement user authentication flow"</div>
-                </div>
-                <div className={styles.aiMockupGrid}>
-                  <div className={styles.aiMockupMetric}>
-                    <div className={styles.aiMockupMetricLabel}>Effort</div>
-                    <div className={styles.aiMockupMetricValue} style={{color:'#f59e0b'}}>M</div>
+                <div className={styles.aiMockupCard}>
+                  <div className={styles.aiMockupHeader}>
+                    <IoSparkles style={{color:'#e879a0'}} />
+                    <span>AI Analysis — Gemini 2.0 Flash</span>
                   </div>
-                  <div className={styles.aiMockupMetric}>
-                    <div className={styles.aiMockupMetricLabel}>Est. Hours</div>
-                    <div className={styles.aiMockupMetricValue} style={{color:'#e879a0'}}>8h</div>
+                  <div className={styles.aiMockupTask}>
+                    <div className={styles.aiMockupLabel}>Task</div>
+                    <div className={styles.aiMockupValue}>"Implement user authentication flow"</div>
                   </div>
-                  <div className={styles.aiMockupMetric}>
-                    <div className={styles.aiMockupMetricLabel}>Due Date</div>
-                    <div className={styles.aiMockupMetricValue} style={{color:'#10b981', fontSize:'0.95rem'}}>Jul 4</div>
+                  <div className={styles.aiMockupGrid}>
+                    <div className={styles.aiMockupMetric}>
+                      <div className={styles.aiMockupMetricLabel}>Effort</div>
+                      <div className={styles.aiMockupMetricValue} style={{color:'#f59e0b'}}>M</div>
+                    </div>
+                    <div className={styles.aiMockupMetric}>
+                      <div className={styles.aiMockupMetricLabel}>Est. Hours</div>
+                      <div className={styles.aiMockupMetricValue} style={{color:'#e879a0'}}>8h</div>
+                    </div>
+                    <div className={styles.aiMockupMetric}>
+                      <div className={styles.aiMockupMetricLabel}>Due Date</div>
+                      <div className={styles.aiMockupMetricValue} style={{color:'#10b981', fontSize:'0.95rem'}}>Jul 4</div>
+                    </div>
                   </div>
-                </div>
-                <div className={styles.aiMockupReasoning}>
-                  "Authentication requires login, registration, JWT issuance, refresh logic, and protected routes — medium complexity, typically a day of focused development."
-                </div>
-                <div className={styles.aiMockupActions}>
-                  <button className={styles.aiMockupAccept}>
-                    <IoCheckmark /> Accept Estimate
-                  </button>
-                  <button className={styles.aiMockupDismiss}>Edit Manually</button>
+                  <div className={styles.aiMockupReasoning}>
+                    "Authentication requires login, registration, JWT issuance, refresh logic, and protected routes — medium complexity, typically a day of focused development."
+                  </div>
+                  <div className={styles.aiMockupActions}>
+                    <button className={styles.aiMockupAccept}>
+                      <IoCheckmark /> Accept Estimate
+                    </button>
+                    <button className={styles.aiMockupDismiss}>Edit Manually</button>
+                  </div>
                 </div>
               </div>
             </div>

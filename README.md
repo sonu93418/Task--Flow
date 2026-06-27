@@ -173,6 +173,299 @@
 <br/>
 
 <!-- ============================================================
+     SYSTEM DESIGN & WORKFLOW
+     ============================================================ -->
+
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:6366f1,50:8b5cf6,100:06b6d4&height=2" width="100%"/>
+
+## 🏗️ System Design & Workflow
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:6366f1,50:8b5cf6,100:06b6d4&height=2" width="100%"/>
+
+</div>
+
+<br/>
+
+### 🌐 High-Level Architecture
+
+```mermaid
+graph TB
+    subgraph CLIENT["🖥️ Client  ·  React + Vite  (port 5173)"]
+        direction TB
+        UI["Pages & Components"]
+        CTX["Context\nAuthContext · ThemeContext"]
+        API_MOD["API Modules\naxios · auth · boards · tasks · ai"]
+        UI --> CTX
+        UI --> API_MOD
+    end
+
+    subgraph SERVER["⚙️ Server  ·  Express  (port 5000)"]
+        direction TB
+        ROUTES["Routes\n/auth  /boards  /tasks  /ai"]
+        MW["Middleware\nJWT Auth · Joi Validate · Error Handler"]
+        CTRL["Controllers\nauth · board · task · ai"]
+        SVC["Services\naiService.js"]
+        ROUTES --> MW --> CTRL --> SVC
+    end
+
+    subgraph EXTERNAL["☁️ External Services"]
+        DB[("🍃 MongoDB Atlas")]
+        GEMINI["🤖 Google Gemini API"]
+        GOAUTH["🔵 Google OAuth 2.0"]
+        GHAUTH["⚫ GitHub OAuth 2.0"]
+    end
+
+    API_MOD -- "HTTP/REST + JWT" --> ROUTES
+    CTRL -- "Mongoose ODM" --> DB
+    SVC -- "REST API" --> GEMINI
+    ROUTES -- "Passport strategy" --> GOAUTH
+    ROUTES -- "Passport strategy" --> GHAUTH
+
+    style CLIENT fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#e0e7ff
+    style SERVER fill:#1a1a2e,stroke:#8b5cf6,stroke-width:2px,color:#e0e7ff
+    style EXTERNAL fill:#0f172a,stroke:#06b6d4,stroke-width:2px,color:#e0e7ff
+```
+
+<br/>
+
+---
+
+### 🔐 Authentication Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as 👤 User
+    participant FE as 🖥️ React Frontend
+    participant BE as ⚙️ Express Server
+    participant DB as 🍃 MongoDB
+    participant OAUTH as 🔵 Google / GitHub
+
+    rect rgb(30, 27, 75)
+        Note over U,DB: ── Email / Password Login ──
+        U->>FE: Enter email + password
+        FE->>BE: POST /api/auth/login
+        BE->>DB: Find user by email
+        DB-->>BE: User document
+        BE->>BE: bcrypt.compare(password, hash)
+        BE-->>FE: { token: JWT, user }
+        FE->>FE: Store JWT in memory\nSet AuthContext
+        FE-->>U: Redirect → /dashboard
+    end
+
+    rect rgb(15, 23, 42)
+        Note over U,OAUTH: ── OAuth Login (Google / GitHub) ──
+        U->>FE: Click "Sign in with Google"
+        FE->>BE: GET /api/auth/google
+        BE->>OAUTH: Redirect to OAuth consent screen
+        OAUTH-->>BE: Callback with auth code
+        BE->>OAUTH: Exchange code for profile
+        OAUTH-->>BE: { id, email, name, avatar }
+        BE->>DB: findOrCreate user by providerId
+        DB-->>BE: User document
+        BE-->>FE: Redirect /auth/callback?token=JWT
+        FE->>FE: Extract token from URL\nSet AuthContext
+        FE-->>U: Redirect → /dashboard
+    end
+
+    rect rgb(20, 30, 48)
+        Note over U,BE: ── Authenticated Request ──
+        U->>FE: Any protected action
+        FE->>BE: Request + Authorization: Bearer JWT
+        BE->>BE: jwt.verify(token, secret)
+        BE-->>FE: Protected resource / 401 Unauthorized
+    end
+```
+
+<br/>
+
+---
+
+### 📋 Kanban Task Lifecycle
+
+```mermaid
+stateDiagram-v2
+    direction LR
+
+    [*] --> Todo : ➕ Task Created
+
+    Todo --> InProgress : 🖱️ Drag to\n"In Progress"\nor Edit Status
+
+    InProgress --> Todo : ↩️ Move back
+
+    InProgress --> Done : ✅ Drag to\n"Done"\nor Edit Status
+
+    Done --> InProgress : ↩️ Re-open task
+
+    Done --> [*] : 🗑️ Delete task\n🎉 Confetti fires!
+
+    Todo --> [*] : 🗑️ Delete task
+
+    note right of Todo
+        Fields available:
+        • Title & Description
+        • Priority (low/med/high)
+        • Due Date
+        • Effort (S/M/L)
+    end note
+
+    note right of InProgress
+        Position tracked via
+        numeric index for
+        drag-and-drop ordering
+    end note
+
+    note right of Done
+        Triggers canvas-confetti
+        celebration animation
+    end note
+```
+
+<br/>
+
+---
+
+### 🤖 AI Estimation Workflow
+
+```mermaid
+flowchart TD
+    A([👤 User opens Task Modal]) --> B[Fills in Title & Description]
+    B --> C[Clicks ✨ AI Suggest]
+    C --> D[POST /api/ai/suggest\ntitle + description]
+
+    D --> E{GEMINI_API_KEY\nconfigured?}
+
+    E -- ❌ No --> MOCK
+    E -- ✅ Yes --> F[Build structured prompt\nwith today's date]
+
+    F --> G{Try gemini-2.0-flash}
+    G -- ✅ Success --> PARSE
+    G -- ⚠️ 429 Quota --> H{Try gemini-1.5-flash}
+    H -- ✅ Success --> PARSE
+    H -- ⚠️ 429 Quota --> I{Try gemini-1.5-flash-8b}
+    I -- ✅ Success --> PARSE
+    I -- ❌ All failed --> MOCK
+
+    PARSE["📦 Parse JSON response\n{ effort, estimatedHours,\n  suggestedDueDate, reasoning }"]
+    PARSE --> VALIDATE{Valid\nresponse?}
+    VALIDATE -- ✅ Yes --> RETURN["Return to frontend"]
+    VALIDATE -- ❌ No --> MOCK
+
+    MOCK["🔄 Fallback mock estimate\nbased on title length\n⚠️ isMock: true"]
+    MOCK --> RETURN
+
+    RETURN --> J["Auto-fill modal fields\n• Effort badge\n• Due date picker\n• Reasoning tooltip"]
+    J --> K{User decision}
+    K -- ✅ Accept --> L[Save Task to DB]
+    K -- ✏️ Edit --> M[Modify fields] --> L
+    K -- ❌ Discard --> N([Modal closed, no save])
+
+    style A fill:#1e1b4b,stroke:#6366f1,color:#e0e7ff
+    style MOCK fill:#3b1515,stroke:#ef4444,color:#fecaca
+    style PARSE fill:#0f2a1e,stroke:#22c55e,color:#bbf7d0
+    style RETURN fill:#0c1a2e,stroke:#06b6d4,color:#cffafe
+    style L fill:#1a1a3e,stroke:#8b5cf6,color:#ede9fe
+```
+
+<br/>
+
+---
+
+### 🗄️ Database Schema
+
+```mermaid
+erDiagram
+    USER {
+        ObjectId _id PK
+        string   name
+        string   email UK
+        string   password "hashed · optional for OAuth"
+        string   provider "local | google | github"
+        string   providerId
+        string   avatar
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    BOARD {
+        ObjectId _id PK
+        string   title
+        string   description
+        ObjectId owner FK
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    TASK {
+        ObjectId _id PK
+        string   title
+        string   description
+        string   status "todo | in-progress | done"
+        string   priority "low | medium | high"
+        date     dueDate
+        string   estimatedEffort "S | M | L"
+        number   position
+        ObjectId board FK
+        ObjectId owner FK
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    USER ||--o{ BOARD : "owns"
+    USER ||--o{ TASK  : "owns"
+    BOARD ||--o{ TASK  : "contains"
+```
+
+<br/>
+
+---
+
+### 🔄 Request / Response Cycle
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant FE as 🖥️ React
+    participant AX as 📡 Axios Instance
+    participant EX as ⚙️ Express
+    participant MW as 🛡️ Middleware Stack
+    participant CTRL as 🎮 Controller
+    participant MG as 🍃 Mongoose
+
+    FE->>AX: API call (e.g. createTask)
+    AX->>AX: Attach Authorization: Bearer JWT\nfrom memory / context
+    AX->>EX: HTTP Request
+
+    rect rgb(20, 20, 50)
+        Note over EX,MG: ── Server pipeline ──
+        EX->>MW: cors() → json() → session()
+        MW->>MW: auth.js → jwt.verify()
+        MW->>MW: validate.js → Joi schema check
+        MW->>CTRL: req.user injected ✅
+        CTRL->>MG: DB query (find / create / update)
+        MG-->>CTRL: Document(s)
+        CTRL-->>EX: res.json({ success, data })
+    end
+
+    EX-->>AX: HTTP Response
+    AX-->>FE: Resolved Promise → update state
+
+    Note over FE,AX: On 401 → clear auth\nRedirect to /login
+```
+
+<br/>
+
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:6366f1,50:8b5cf6,100:06b6d4&height=2" width="100%"/>
+
+</div>
+
+<br/>
+
+<!-- ============================================================
      PROJECT STRUCTURE
      ============================================================ -->
 

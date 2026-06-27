@@ -8,6 +8,7 @@ import {
 import ThemeToggle from '../components/UI/ThemeToggle';
 import styles from './Landing.module.css';
 import logoSvg from '../assets/logo.svg';
+import workflowDemo from '../assets/workflow_demo.webp';
 
 const FEATURES = [
   {
@@ -171,28 +172,8 @@ export default function Landing() {
               <span className={styles.mockupDot} style={{background:'#28c840'}} />
               <span className={styles.mockupUrl}>app.taskflow.io — Kanban Board</span>
             </div>
-            <div className={styles.mockupBoard}>
-              {[
-                { col: 'To Do', color: '#6366f1', tasks: ['API rate limiting', 'Write unit tests'] },
-                { col: 'In Progress', color: '#f59e0b', tasks: ['User dashboard'] },
-                { col: 'Done', color: '#10b981', tasks: ['Database schema', 'JWT auth flow'] },
-              ].map(col => (
-                <div key={col.col} className={styles.mockupCol}>
-                  <div className={styles.mockupColHeader}>
-                    <span className={styles.mockupColDot} style={{background: col.color}} />
-                    {col.col}
-                  </div>
-                  {col.tasks.map(t => (
-                    <div key={t} className={styles.mockupCard}>
-                      <div className={styles.mockupCardTitle}>{t}</div>
-                      <div className={styles.mockupCardMeta}>
-                        <span className={styles.mockupPriority}>medium</span>
-                        <span className={styles.mockupDate}>Jul 4</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ))}
+            <div className={styles.mockupVideoWrapper}>
+              <img src={workflowDemo} className={styles.mockupVideo} alt="TaskFlow Workflow Demo" />
             </div>
           </div>
         </div>

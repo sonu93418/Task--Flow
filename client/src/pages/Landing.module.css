@@ -379,11 +379,16 @@
 /* ─── STEPS ─── */
 .stepsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 1.25rem;
+  position: relative;
 }
 
 .stepCard {
+  position: relative;
+  overflow: visible;
+  z-index: 1;
   background: var(--bg-card);
   border: 1.5px solid var(--border-light);
   border-radius: var(--radius-lg);
@@ -398,6 +403,35 @@
   border-color: var(--indigo-light);
 }
 
+.stepDecorCircle {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  filter: blur(45px);
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.14;
+}
+
+.stepCircleIndigo {
+  top: -20px;
+  left: -20px;
+  background: var(--indigo-light);
+}
+
+.stepCircleOrange {
+  bottom: -20px;
+  right: -20px;
+  background: var(--kitsune);
+}
+
+.stepCircleTeal {
+  top: -20px;
+  right: -20px;
+  background: var(--matcha);
+}
+
 .stepImageWrapper {
   width: 100%;
   aspect-ratio: 4/3;
@@ -409,6 +443,7 @@
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border-light);
+  z-index: 2;
 }
 
 .stepImage {
@@ -451,6 +486,33 @@
   color: var(--text-secondary);
   line-height: 1.6;
   margin: 0;
+}
+
+.stepConnector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  width: 40px;
+  height: 40px;
+  z-index: 2;
+}
+
+.connectorArrow {
+  width: 28px;
+  height: 28px;
+  stroke: var(--text-muted);
+  animation: nudgeArrow 1.5s ease-in-out infinite;
+}
+
+@keyframes nudgeArrow {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(8px); }
+}
+
+@keyframes nudgeArrowDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
 }
 
 /* ─── AI SECTION ─── */
@@ -695,6 +757,19 @@
   .heroCta { justify-content: center; }
   .heroStats { justify-content: center; }
   .heroMockup { width: 100%; max-width: 100%; }
+  .stepsGrid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .stepConnector {
+    transform: rotate(90deg);
+    margin: 0.5rem 0;
+  }
+  .connectorArrow {
+    animation: nudgeArrowDown 1.5s ease-in-out infinite;
+  }
   .aiContent { flex-direction: column; gap: 3rem; }
   .aiLeft .sectionTitle { text-align: center; }
   .aiDesc { max-width: 100%; }

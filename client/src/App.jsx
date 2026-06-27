@@ -11,6 +11,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import BoardView from './pages/BoardView';
 import NotFound from './pages/NotFound';
+import OAuthCallback from './pages/OAuthCallback';
 
 // Redirect authenticated users away from public pages
 function AuthRedirect({ children }) {
@@ -29,6 +30,9 @@ function AppRoutes() {
       {/* Auth routes — redirect to dashboard if already logged in */}
       <Route path="/login" element={<AuthRedirect><Login /></AuthRedirect>} />
       <Route path="/register" element={<AuthRedirect><Register /></AuthRedirect>} />
+
+      {/* OAuth callback — receives token from server redirect */}
+      <Route path="/auth/callback" element={<OAuthCallback />} />
 
       {/* Protected app routes */}
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>

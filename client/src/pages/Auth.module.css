@@ -558,3 +558,17 @@
   width: 100%;
   height: 100%;
 }
+
+/* ─── OAuth Callback Spinner ─── */
+.oauthSpinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--border-light);
+  border-top-color: var(--indigo);
+  border-radius: 50%;
+  animation: oauthSpin 0.8s linear infinite;
+}
+
+@keyframes oauthSpin {
+  to { transform: rotate(360deg); }
+}

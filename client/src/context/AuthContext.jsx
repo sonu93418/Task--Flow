@@ -60,6 +60,28 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  /**
+   * Login using a JWT token directly (used after OAuth redirect).
+   * Stores the token and fetches the user profile from /auth/me.
+   */
+  const loginWithToken = useCallback(async (token) => {
+    setError(null);
+    try {
+      localStorage.setItem('taskflow_token', token);
+      const res = await getMe();
+      const userData = res.data.data.user;
+      localStorage.setItem('taskflow_user', JSON.stringify(userData));
+      setUser(userData);
+      return userData;
+    } catch (err) {
+      localStorage.removeItem('taskflow_token');
+      localStorage.removeItem('taskflow_user');
+      const message = err.response?.data?.message || err.message || 'OAuth login failed';
+      setError(message);
+      throw new Error(message);
+    }
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem('taskflow_token');
     localStorage.removeItem('taskflow_user');
@@ -70,7 +92,7 @@ export function AuthProvider({ children }) {
   const clearError = useCallback(() => setError(null), []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, clearError }}>
+    <AuthContext.Provider value={{ user, loading, error, login, register, loginWithToken, logout, clearError }}>
       {children}
     </AuthContext.Provider>
   );

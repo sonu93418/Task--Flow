@@ -1,7 +1,10 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import session from 'express-session';
+import passport from 'passport';
 import connectDB from './config/db.js';
+import configurePassport from './config/passport.js';
 import errorHandler from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import boardRoutes from './routes/boardRoutes.js';
@@ -24,6 +27,19 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json({ limit: '1mb' }));
+
+// Session (required by Passport for OAuth handshake)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'taskflow-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false, maxAge: 5 * 60 * 1000 } // 5 min — only used during OAuth handshake
+}));
+
+// Passport initialization
+configurePassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Request logger
 app.use((req, _res, next) => {

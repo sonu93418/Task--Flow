@@ -18,23 +18,37 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
     minlength: [6, 'Password must be at least 6 characters'],
     select: false // Don't return password by default in queries
+    // NOT required — OAuth users won't have a password
+  },
+  provider: {
+    type: String,
+    enum: ['local', 'google', 'github'],
+    default: 'local'
+  },
+  providerId: {
+    type: String,
+    default: null
+  },
+  avatar: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true
 });
 
-// Hash password before saving
+// Hash password before saving (only if password exists and was modified)
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.password || !this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
 // Compare candidate password with hashed password
 userSchema.methods.comparePassword = async function (candidatePassword) {
+  if (!this.password) return false;
   return bcrypt.compare(candidatePassword, this.password);
 };
 

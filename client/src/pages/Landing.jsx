@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Fragment } from 'react';
 import {
   IoCheckmarkCircle, IoLayersOutline, IoSparkles, IoShieldCheckmark,
   IoTrendingUp, IoPeopleOutline, IoCalendarOutline, IoArrowForward,
@@ -23,7 +24,7 @@ const FEATURES = [
   {
     icon: <IoSparkles />,
     title: 'Gemini AI Sizing',
-    desc: 'Get instant, context-aware effort estimates, complexity mapping, and hour projections powered by Google Gemini.',
+    desc: 'Get instant, context-aware effort estimates, complexity mapping, and hour projections powered by TaskFlow AI.',
     color: '#e879a0'
   },
   {
@@ -51,7 +52,7 @@ const STEPS = [
     num: '03',
     image: stepShipAi,
     title: 'Ship with AI Sizing',
-    desc: 'Leverage Gemini AI estimation models to dynamically size tasks, calibrate development hours, and hit deadlines with confidence.',
+    desc: 'Leverage TaskFlow AI estimation models to dynamically size tasks, calibrate development hours, and hit deadlines with confidence.',
   }
 ];
 
@@ -92,7 +93,7 @@ export default function Landing() {
       <section className={styles.hero}>
         <div className={styles.heroContent}>
           <div className={styles.heroBadge}>
-            <IoSparkles /> &nbsp; Powered by Google Gemini AI
+            <IoSparkles /> &nbsp; Powered by TaskFlow AI
           </div>
           <h1 className={styles.heroTitle}>
             Project Management<br />
@@ -210,17 +211,29 @@ export default function Landing() {
             A streamlined project workspace designed to get your team building immediately without overhead.
           </p>
           <div className={styles.stepsGrid}>
-            {STEPS.map((step) => (
-              <div key={step.num} className={styles.stepCard}>
-                <div className={styles.stepImageWrapper}>
-                  <img src={step.image} className={styles.stepImage} alt={step.title} />
+            {STEPS.map((step, idx) => (
+              <Fragment key={step.num}>
+                <div className={styles.stepCard}>
+                  <div className={`${styles.stepDecorCircle} ${
+                    step.num === '01' ? styles.stepCircleIndigo : step.num === '02' ? styles.stepCircleOrange : styles.stepCircleTeal
+                  }`} />
+                  <div className={styles.stepImageWrapper}>
+                    <img src={step.image} className={styles.stepImage} alt={step.title} />
+                  </div>
+                  <div className={styles.stepHeader}>
+                    <span className={styles.stepNum}>{step.num}</span>
+                    <h3 className={styles.stepTitle}>{step.title}</h3>
+                  </div>
+                  <p className={styles.stepDesc}>{step.desc}</p>
                 </div>
-                <div className={styles.stepHeader}>
-                  <span className={styles.stepNum}>{step.num}</span>
-                  <h3 className={styles.stepTitle}>{step.title}</h3>
-                </div>
-                <p className={styles.stepDesc}>{step.desc}</p>
-              </div>
+                {idx < STEPS.length - 1 && (
+                  <div className={styles.stepConnector}>
+                    <svg viewBox="0 0 24 24" className={styles.connectorArrow}>
+                      <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                    </svg>
+                  </div>
+                )}
+              </Fragment>
             ))}
           </div>
         </div>
@@ -238,7 +251,7 @@ export default function Landing() {
                 Stop Guessing.<br /><span className={styles.accentUnderlinePink}>Start Shipping.</span>
               </h2>
               <p className={styles.aiDesc}>
-                TaskFlow's AI engine — powered by Google Gemini — analyzes your task title and description,
+                TaskFlow's AI engine — powered by TaskFlow AI — analyzes your task title and description,
                 then returns a structured estimate: effort size, expected hours, and a recommended due date.
                 All in under 2 seconds. Accept it or override it — you remain in control.
               </p>
@@ -405,7 +418,7 @@ export default function Landing() {
             <a href="#tech" className={styles.footerLink}>Architecture</a>
           </div>
           <p className={styles.footerCopy}>
-            © 2026 TaskFlow · Built with React 19, Node.js & MongoDB · Powered by Google Gemini AI
+            © 2026 TaskFlow · Built with React 19, Node.js & MongoDB · Powered by TaskFlow AI
           </p>
         </div>
       </footer>

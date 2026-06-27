@@ -7,6 +7,15 @@ const generateToken = (userId) => {
   });
 };
 
+/** Helper to build a consistent user data object */
+const formatUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  avatar: user.avatar || null,
+  provider: user.provider || 'local'
+});
+
 // POST /api/auth/register
 export const register = async (req, res, next) => {
   try {
@@ -21,14 +30,14 @@ export const register = async (req, res, next) => {
       });
     }
 
-    const user = await User.create({ name, email, password });
+    const user = await User.create({ name, email, password, provider: 'local' });
     const token = generateToken(user._id);
 
     res.status(201).json({
       success: true,
       data: {
         token,
-        user: { id: user._id, name: user.name, email: user.email }
+        user: formatUser(user)
       }
     });
   } catch (error) {
@@ -49,6 +58,14 @@ export const login = async (req, res, next) => {
       });
     }
 
+    // If user signed up via OAuth and has no password
+    if (!user.password) {
+      return res.status(401).json({
+        success: false,
+        message: `This account uses ${user.provider} login. Please sign in with ${user.provider}.`
+      });
+    }
+
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
@@ -63,7 +80,7 @@ export const login = async (req, res, next) => {
       success: true,
       data: {
         token,
-        user: { id: user._id, name: user.name, email: user.email }
+        user: formatUser(user)
       }
     });
   } catch (error) {
@@ -77,4 +94,23 @@ export const getMe = async (req, res) => {
     success: true,
     data: { user: req.user }
   });
+};
+
+// OAuth callback handler — generates JWT and redirects to client
+export const oauthCallback = (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/login?error=auth_failed`);
+    }
+
+    const token = generateToken(user._id);
+    const clientURL = process.env.CLIENT_URL || 'http://localhost:5173';
+
+    // Redirect to client with token in query string
+    res.redirect(`${clientURL}/auth/callback?token=${token}`);
+  } catch (error) {
+    console.error('OAuth callback error:', error);
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/login?error=server_error`);
+  }
 };

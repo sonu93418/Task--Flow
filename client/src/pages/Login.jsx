@@ -18,6 +18,8 @@ export default function Login() {
   const { login }               = useAuth();
   const navigate                = useNavigate();
 
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -168,7 +170,7 @@ export default function Login() {
               <button
                 type="button"
                 className={styles.socialButton}
-                onClick={() => alert('Demo Google Login')}
+                onClick={() => { window.location.href = `${API_BASE}/auth/google`; }}
               >
                 <IoLogoGoogle className={styles.googleIcon} />
                 <span>Login with Google</span>
@@ -176,7 +178,7 @@ export default function Login() {
               <button
                 type="button"
                 className={styles.socialButton}
-                onClick={() => alert('Demo GitHub Login')}
+                onClick={() => { window.location.href = `${API_BASE}/auth/github`; }}
               >
                 <IoLogoGithub className={styles.githubIcon} />
                 <span>Login with GitHub</span>

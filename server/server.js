@@ -15,13 +15,17 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+const allowedOrigins = process.env.CLIENT_URL
+  ? [process.env.CLIENT_URL, 'http://localhost:5173']
+  : ['http://localhost:5173'];
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow any localhost origin in development
-    if (!origin || origin.startsWith('http://localhost')) {
+    // Allow requests with no origin (e.g. mobile apps, curl) or matching origins
+    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost')) {
       callback(null, true);
     } else {
-      callback(new Error('CORS not allowed'));
+      callback(new Error(`CORS not allowed for origin: ${origin}`));
     }
   },
   credentials: true

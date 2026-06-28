@@ -20,8 +20,8 @@ export default function Layout() {
     try {
       const res = await getBoards();
       setBoards(res.data.data);
-    } catch (err) {
-      console.error('Failed to fetch boards:', err);
+    } catch {
+      // boards fetch failure is non-fatal — sidebar simply stays empty
     }
   }, []);
 

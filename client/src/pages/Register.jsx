@@ -29,7 +29,8 @@ export default function Register() {
     }
   }, [searchParams]);
 
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  // OAuth redirects go directly to the backend — use the same env var as axios
+  const API_BASE = import.meta.env.VITE_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

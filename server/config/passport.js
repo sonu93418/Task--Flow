@@ -87,7 +87,8 @@ export default function configurePassport() {
       passReqToCallback: true
     }, async (req, _accessToken, _refreshToken, profile, done) => {
       try {
-        const action = req.session?.authAction || 'login';
+        // action is decoded from the OAuth state param by the route handler
+        const action = req._oauthAction || 'login';
         const user = await handleOAuthUser('google', profile, action);
         done(null, user);
       } catch (err) {
@@ -109,7 +110,8 @@ export default function configurePassport() {
       passReqToCallback: true
     }, async (req, _accessToken, _refreshToken, profile, done) => {
       try {
-        const action = req.session?.authAction || 'login';
+        // action is decoded from the OAuth state param by the route handler
+        const action = req._oauthAction || 'login';
         const user = await handleOAuthUser('github', profile, action);
         done(null, user);
       } catch (err) {

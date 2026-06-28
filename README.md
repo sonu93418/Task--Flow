@@ -7,7 +7,7 @@
 <img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0:6366f1,50:8b5cf6,100:06b6d4&height=200&section=header&text=TaskFlow&fontSize=80&fontColor=ffffff&fontAlignY=38&desc=AI-Powered%20Kanban%20Task%20Manager&descAlignY=60&descSize=20&animation=fadeIn" />
 
 <!-- Animated typing headline -->
-<a href="https://github.com/your-username/task-flow">
+<a href="https://task-flow-eight-teal.vercel.app" target="_blank">
   <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=28&pause=1000&color=6366F1&center=true&vCenter=true&width=600&lines=Plan.+Build.+Ship.+%F0%9F%9A%80;Drag+%26+Drop+Kanban+Boards;AI+Effort+Estimation+%F0%9F%A4%96;Dark+Mode+%2B+OAuth+Support;Full-Stack+React+%2B+Express" alt="Typing SVG" />
 </a>
 
@@ -33,6 +33,26 @@
   <img src="https://img.shields.io/badge/Status-Active-6366f1?style=flat-square" />
   <img src="https://img.shields.io/badge/Version-1.0.0-8b5cf6?style=flat-square" />
   <img src="https://img.shields.io/badge/PRs-Welcome-06b6d4?style=flat-square" />
+</p>
+
+<br/>
+
+<!-- Live deployment links -->
+<p>
+  <a href="https://task-flow-eight-teal.vercel.app" target="_blank">
+    <img src="https://img.shields.io/badge/🚀%20Live%20Demo-task--flow--eight--teal.vercel.app-6366f1?style=for-the-badge&logo=vercel&logoColor=white" />
+  </a>
+</p>
+<p>
+  <a href="https://task-flow-eight-teal.vercel.app" target="_blank">
+    <img src="https://img.shields.io/badge/Frontend-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" />
+  </a>
+  <a href="https://task-flow-bnp3.onrender.com/api/health" target="_blank">
+    <img src="https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render&logoColor=black" />
+  </a>
+  <a href="https://task-flow-eight-teal.vercel.app/login" target="_blank">
+    <img src="https://img.shields.io/badge/Login-Click%20Here-8b5cf6?style=for-the-badge&logo=react&logoColor=white" />
+  </a>
 </p>
 
 <!-- Animated glowing divider -->

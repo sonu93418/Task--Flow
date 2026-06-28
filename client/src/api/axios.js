@@ -1,19 +1,23 @@
 import axios from 'axios';
 
 // Centralised API base URL.
-// In dev:  reads from .env  (VITE_API_URL=http://localhost:5000/api)
-// In prod: reads from .env.production  (VITE_API_URL=https://task-flow-bnp3.onrender.com/api)
-// Never falls back to a hardcoded localhost — misconfiguration must be caught early.
-const API_URL = import.meta.env.VITE_API_URL;
+// Priority order:
+//   1. VITE_API_URL set in Vercel dashboard / .env.production / .env
+//   2. If running locally with Vite dev server, use relative '/api'
+//      so Vite's built-in proxy forwards to localhost:5000 automatically.
+//      This means NO hardcoded localhost — the proxy handles it.
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? '/api' : null);
 
 if (!API_URL) {
-  console.warn('[TaskFlow] VITE_API_URL is not set. API calls will fail.');
+  console.warn('[TaskFlow] VITE_API_URL is not set. API calls may fail.');
 }
 
 const api = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 30000, // 30 s — accounts for Render free-tier cold start
+  timeout: 30000, // 30 s — covers Render free-tier cold starts
 });
 
 // ── Request interceptor: attach JWT ──────────────────────────────

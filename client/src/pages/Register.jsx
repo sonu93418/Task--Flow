@@ -29,8 +29,12 @@ export default function Register() {
     }
   }, [searchParams]);
 
-  // OAuth redirects go directly to the backend — use the same env var as axios
-  const API_BASE = import.meta.env.VITE_API_URL;
+  // OAuth buttons redirect the browser directly to the backend.
+  // Use VITE_API_URL from env (set in Vercel dashboard for prod).
+  // In local dev this still works because the full localhost URL is in .env.
+  const API_BASE =
+    import.meta.env.VITE_API_URL ||
+    'https://task-flow-bnp3.onrender.com/api'; // hard fallback — never undefined
 
   const handleSubmit = async (e) => {
     e.preventDefault();

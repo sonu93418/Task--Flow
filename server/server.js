@@ -14,6 +14,10 @@ import aiRoutes from './routes/aiRoutes.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust Render's reverse proxy so req.protocol === 'https' and
+// secure cookies are set correctly in production.
+app.set('trust proxy', 1);
+
 // Middleware
 const allowedOrigins = process.env.CLIENT_URL
   ? [process.env.CLIENT_URL, 'http://localhost:5173']
@@ -32,12 +36,19 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '1mb' }));
 
-// Session (required by Passport for OAuth handshake)
+// Session (required by Passport for the OAuth handshake only).
+// secure: true is required on Render (HTTPS). sameSite: 'none' allows
+// the cookie to survive the Google/GitHub cross-origin redirect.
+const isProduction = process.env.NODE_ENV === 'production';
 app.use(session({
   secret: process.env.SESSION_SECRET || 'taskflow-session-secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, maxAge: 5 * 60 * 1000 } // 5 min — only used during OAuth handshake
+  cookie: {
+    secure: isProduction,          // HTTPS only in prod, plain HTTP in dev
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 10 * 60 * 1000         // 10 min — enough for the full OAuth round-trip
+  }
 }));
 
 // Passport initialization

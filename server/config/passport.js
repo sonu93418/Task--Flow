@@ -63,18 +63,31 @@ export default function configurePassport() {
     }
   });
 
+  // Build absolute callback URLs using the server's own public URL.
+  // On Render this is set via the RENDER_EXTERNAL_URL env var (injected automatically).
+  // Fallback to localhost for local development.
+  const SERVER_URL =
+    process.env.RENDER_EXTERNAL_URL ||        // auto-set by Render: https://task-flow-bnp3.onrender.com
+    process.env.SERVER_URL ||                  // optional manual override
+    'http://localhost:5000';
+
+  const googleCallbackURL = `${SERVER_URL}/api/auth/google/callback`;
+  const githubCallbackURL = `${SERVER_URL}/api/auth/github/callback`;
+
+  console.log(`🔗 Google OAuth callback: ${googleCallbackURL}`);
+  console.log(`🔗 GitHub OAuth callback: ${githubCallbackURL}`);
+
   // ─── Google OAuth 2.0 Strategy ───
-  // Always register if env vars exist (even if wrong — Google will show the error)
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     passport.use(new GoogleStrategy({
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/api/auth/google/callback',
+      callbackURL: googleCallbackURL,   // ← absolute URL, works behind Render's proxy
       scope: ['profile', 'email'],
       passReqToCallback: true
     }, async (req, _accessToken, _refreshToken, profile, done) => {
       try {
-        const action = req.session.authAction || 'login';
+        const action = req.session?.authAction || 'login';
         const user = await handleOAuthUser('google', profile, action);
         done(null, user);
       } catch (err) {
@@ -91,12 +104,12 @@ export default function configurePassport() {
     passport.use(new GitHubStrategy({
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: '/api/auth/github/callback',
+      callbackURL: githubCallbackURL,   // ← absolute URL, works behind Render's proxy
       scope: ['user:email'],
       passReqToCallback: true
     }, async (req, _accessToken, _refreshToken, profile, done) => {
       try {
-        const action = req.session.authAction || 'login';
+        const action = req.session?.authAction || 'login';
         const user = await handleOAuthUser('github', profile, action);
         done(null, user);
       } catch (err) {

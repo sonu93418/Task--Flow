@@ -5,6 +5,7 @@ import {
   DragOverlay,
   PointerSensor,
   TouchSensor,
+  KeyboardSensor,
   useSensor,
   useSensors,
   rectIntersection,
@@ -14,6 +15,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
   useSortable,
+  sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
@@ -30,46 +32,24 @@ import styles from './BoardView.module.css';
 import confetti from 'canvas-confetti';
 
 const triggerConfetti = () => {
-  confetti({
-    particleCount: 80,
-    spread: 60,
-    origin: { y: 0.6 }
-  });
-  
+  confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
   const end = Date.now() + 1500;
   const colors = ['#6366f1', '#e879a0', '#10b981', '#f59e0b'];
-
   (function frame() {
-    confetti({
-      particleCount: 2,
-      angle: 60,
-      spread: 55,
-      origin: { x: 0, y: 0.8 },
-      colors
-    });
-    confetti({
-      particleCount: 2,
-      angle: 120,
-      spread: 55,
-      origin: { x: 1, y: 0.8 },
-      colors
-    });
-
-    if (Date.now() < end) {
-      requestAnimationFrame(frame);
-    }
+    confetti({ particleCount: 2, angle: 60,  spread: 55, origin: { x: 0, y: 0.8 }, colors });
+    confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1, y: 0.8 }, colors });
+    if (Date.now() < end) requestAnimationFrame(frame);
   }());
 };
 
 const COLUMNS = [
-  { id: 'todo', title: 'To Do', dot: styles.dotTodo },
-  { id: 'in-progress', title: 'In Progress', dot: styles.dotProgress },
-  { id: 'done', title: 'Done', dot: styles.dotDone },
+  { id: 'todo',        title: 'To Do',       dot: styles.dotTodo },
+  { id: 'in-progress', title: 'In Progress',  dot: styles.dotProgress },
+  { id: 'done',        title: 'Done',         dot: styles.dotDone },
 ];
-
 const COLUMN_IDS = COLUMNS.map((c) => c.id);
 
-// ── Droppable Column Body ──
+// ── Droppable Column Body ──────────────────────────────────────────────────────
 function DroppableColumnBody({ id, isOver, children }) {
   const { setNodeRef } = useDroppable({ id });
   return (
@@ -82,12 +62,15 @@ function DroppableColumnBody({ id, isOver, children }) {
   );
 }
 
-// ── Sortable Task Card ──
+// ── Sortable Task Card ─────────────────────────────────────────────────────────
+// KEY FIX: listeners are ONLY on the drag handle (the grip icon area),
+// NOT on the entire card. This lets edit/delete buttons receive clicks normally.
 function SortableTaskCard({ task, onEdit, onDelete }) {
   const {
     attributes,
     listeners,
     setNodeRef,
+    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
@@ -99,6 +82,9 @@ function SortableTaskCard({ task, onEdit, onDelete }) {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    // Prevent the browser's default touch behaviour (scroll) on the card
+    // so the TouchSensor can intercept the touch events properly
+    touchAction: 'none',
   };
 
   const isOverdue =
@@ -107,24 +93,38 @@ function SortableTaskCard({ task, onEdit, onDelete }) {
     new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   const priorityClass = {
-    high: styles.priorityHigh,
+    high:   styles.priorityHigh,
     medium: styles.priorityMedium,
-    low: styles.priorityLow,
+    low:    styles.priorityLow,
   }[task.priority] || styles.priorityMedium;
 
   return (
+    // setNodeRef on wrapper — dnd needs to measure the element
+    // attributes (aria) on wrapper — accessibility
+    // listeners go on the DRAG HANDLE only (see below)
     <div
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
       className={`${styles.taskCard} ${isDragging ? styles.taskDragging : ''}`}
     >
+      {/* Drag handle — only this area starts a drag */}
+      <div
+        ref={setActivatorNodeRef}
+        {...listeners}
+        className={styles.dragHandle}
+        aria-label="Drag to reorder"
+      >
+        <span className={styles.dragDots}>⠿</span>
+      </div>
+
       <div className={styles.taskCardHeader}>
         <span className={styles.taskTitle}>{task.title}</span>
+        {/* These buttons are OUTSIDE listeners so they work normally on touch */}
         <div className={styles.taskActions}>
           <button
             className={styles.taskActionBtn}
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); onEdit(task); }}
             aria-label="Edit task"
           >
@@ -132,6 +132,7 @@ function SortableTaskCard({ task, onEdit, onDelete }) {
           </button>
           <button
             className={`${styles.taskActionBtn} ${styles.danger}`}
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); onDelete(task); }}
             aria-label="Delete task"
           >
@@ -159,12 +160,12 @@ function SortableTaskCard({ task, onEdit, onDelete }) {
   );
 }
 
-// ── Drag Overlay Card ──
+// ── Drag Overlay Card (ghost while dragging) ───────────────────────────────────
 function OverlayCard({ task }) {
   const priorityClass = {
-    high: styles.priorityHigh,
+    high:   styles.priorityHigh,
     medium: styles.priorityMedium,
-    low: styles.priorityLow,
+    low:    styles.priorityLow,
   }[task.priority] || styles.priorityMedium;
 
   return (
@@ -180,36 +181,42 @@ function OverlayCard({ task }) {
   );
 }
 
-// ── Main Board View ──
+// ── Main Board View ────────────────────────────────────────────────────────────
 export default function BoardView() {
   const { id: boardId } = useParams();
-  const navigate = useNavigate();
+  const navigate        = useNavigate();
   const { fetchBoards } = useOutletContext();
-  const toast = useToast();
+  const toast           = useToast();
 
-  const [board, setBoard] = useState(null);
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [filterPriority, setFilterPriority] = useState('');
-  const [sortBy, setSortBy] = useState('');
-  const [taskModal, setTaskModal] = useState({ open: false, mode: 'create', task: null, status: 'todo' });
-  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [board,         setBoard]         = useState(null);
+  const [tasks,         setTasks]         = useState([]);
+  const [loading,       setLoading]       = useState(true);
+  const [search,        setSearch]        = useState('');
+  const [filterPriority,setFilterPriority]= useState('');
+  const [sortBy,        setSortBy]        = useState('');
+  const [taskModal,     setTaskModal]     = useState({ open: false, mode: 'create', task: null, status: 'todo' });
+  const [deleteTarget,  setDeleteTarget]  = useState(null);
+  const [activeTask,    setActiveTask]    = useState(null);
+  const [overColumnId,  setOverColumnId]  = useState(null);
 
-  // Active dragging state
-  const [activeTask, setActiveTask] = useState(null);
-  const [overColumnId, setOverColumnId] = useState(null);
-
-  // Snapshot for rollback
   const tasksSnapshot = useRef([]);
 
+  // Sensors:
+  // PointerSensor  — mouse + stylus, activates after 8px movement
+  // TouchSensor    — finger, 250ms hold + 5px tolerance (prevents scroll conflicts)
+  // KeyboardSensor — accessibility
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 200,        // ms hold before drag starts — prevents accidental drags on scroll
-        tolerance: 8,      // px movement allowed during delay
+        delay: 250,
+        tolerance: 5,
       },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
@@ -232,7 +239,6 @@ export default function BoardView() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  // Filter & sort tasks
   const filteredTasks = useMemo(() => {
     let result = [...tasks];
     if (search) {
@@ -253,7 +259,7 @@ export default function BoardView() {
 
   const getColumnTasks = (status) => filteredTasks.filter((t) => t.status === status);
 
-  // ── CRUD handlers ──
+  // ── CRUD ──────────────────────────────────────────────────────────────────
   const handleCreateTask = async (data) => {
     const res = await createTask(boardId, { ...data, status: taskModal.status });
     setTasks((prev) => [...prev, res.data.data]);
@@ -264,9 +270,7 @@ export default function BoardView() {
   const handleUpdateTask = async (data) => {
     const originalTask = taskModal.task;
     const res = await updateTask(boardId, taskModal.task._id, data);
-    setTasks((prev) =>
-      prev.map((t) => (t._id === taskModal.task._id ? res.data.data : t))
-    );
+    setTasks((prev) => prev.map((t) => (t._id === taskModal.task._id ? res.data.data : t)));
     toast.success('Task updated', `"${data.title}" saved`);
     fetchBoards();
     if (originalTask && originalTask.status !== 'done' && data.status === 'done') {
@@ -287,9 +291,7 @@ export default function BoardView() {
     setDeleteTarget(null);
   };
 
-  // ── Drag helpers ──
-
-  // Resolve which column ID an "over" target belongs to
+  // ── Drag helpers ──────────────────────────────────────────────────────────
   const resolveTargetColumn = (over, currentTasks) => {
     if (!over) return null;
     if (COLUMN_IDS.includes(over.id)) return over.id;
@@ -297,53 +299,38 @@ export default function BoardView() {
     return overTask ? overTask.status : null;
   };
 
-  // ── onDragStart ──
   const handleDragStart = ({ active }) => {
     const task = tasks.find((t) => t._id === active.id);
     if (!task) return;
-    tasksSnapshot.current = tasks; // save snapshot
+    tasksSnapshot.current = tasks;
     setActiveTask(task);
   };
 
-  // ── onDragOver: live cross-column move ──
   const handleDragOver = ({ active, over }) => {
     const targetColumn = resolveTargetColumn(over, tasks);
     setOverColumnId(targetColumn);
-
     if (!targetColumn || !activeTask) return;
-    if (activeTask.status === targetColumn) return; // same column — sortable handles
-
-    // Optimistically move task to new column
+    if (activeTask.status === targetColumn) return;
     setTasks((prev) =>
-      prev.map((t) =>
-        t._id === active.id ? { ...t, status: targetColumn } : t
-      )
+      prev.map((t) => t._id === active.id ? { ...t, status: targetColumn } : t)
     );
     setActiveTask((prev) => ({ ...prev, status: targetColumn }));
   };
 
-  // ── onDragEnd ──
   const handleDragEnd = async ({ active, over }) => {
     const task = tasksSnapshot.current.find((t) => t._id === active.id);
     setActiveTask(null);
     setOverColumnId(null);
 
-    if (!over || !task) {
-      setTasks(tasksSnapshot.current);
-      return;
-    }
+    if (!over || !task) { setTasks(tasksSnapshot.current); return; }
 
     const targetColumn = resolveTargetColumn(over, tasks);
-    if (!targetColumn) {
-      setTasks(tasksSnapshot.current);
-      return;
-    }
+    if (!targetColumn) { setTasks(tasksSnapshot.current); return; }
 
-    const colTasks = tasks.filter((t) => t.status === targetColumn);
-    const posIdx = colTasks.findIndex((t) => t._id === active.id);
+    const colTasks      = tasks.filter((t) => t.status === targetColumn);
+    const posIdx        = colTasks.findIndex((t) => t._id === active.id);
     const targetPosition = posIdx >= 0 ? posIdx : colTasks.length;
 
-    // No real change
     if (task.status === targetColumn && task.position === targetPosition) return;
 
     try {
@@ -351,28 +338,28 @@ export default function BoardView() {
       const res = await getTasks(boardId);
       setTasks(res.data.data);
       fetchBoards();
-      if (task && task.status !== 'done' && targetColumn === 'done') {
-        triggerConfetti();
-      }
+      if (task.status !== 'done' && targetColumn === 'done') triggerConfetti();
     } catch {
       toast.error('Error', 'Failed to move task');
       setTasks(tasksSnapshot.current);
     }
   };
 
-  // ── onDragCancel ──
   const handleDragCancel = () => {
     setActiveTask(null);
     setOverColumnId(null);
     setTasks(tasksSnapshot.current);
   };
 
+  // ── Render ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className={styles.page}>
         <div className={styles.header}><Skeleton variant="title" width="250px" /></div>
-        <div className={styles.kanban}>
-          {[1, 2, 3].map((i) => <Skeleton key={i} variant="card" height="400px" />)}
+        <div className={styles.kanbanWrapper}>
+          <div className={styles.kanban}>
+            {[1, 2, 3].map((i) => <Skeleton key={i} variant="card" height="400px" />)}
+          </div>
         </div>
       </div>
     );
@@ -380,13 +367,10 @@ export default function BoardView() {
 
   return (
     <div className={styles.page}>
+      {/* ── Header ── */}
       <div className={styles.header}>
         <div className={styles.titleArea}>
-          <button
-            className={styles.backBtn}
-            onClick={() => navigate('/')}
-            aria-label="Back to dashboard"
-          >
+          <button className={styles.backBtn} onClick={() => navigate('/')} aria-label="Back">
             <IoArrowBack />
           </button>
           <h1 className={styles.boardTitle}>{board?.title}</h1>
@@ -410,7 +394,7 @@ export default function BoardView() {
             onChange={(e) => setFilterPriority(e.target.value)}
             id="filter-priority"
           >
-            <option value="">All Priorities</option>
+            <option value="">All Priority</option>
             <option value="high">High</option>
             <option value="medium">Medium</option>
             <option value="low">Low</option>
@@ -421,13 +405,14 @@ export default function BoardView() {
             onChange={(e) => setSortBy(e.target.value)}
             id="sort-by"
           >
-            <option value="">Default Sort</option>
+            <option value="">Sort</option>
             <option value="dueDate">Due Date</option>
             <option value="priority">Priority</option>
           </select>
         </div>
       </div>
 
+      {/* ── Kanban — DndContext wraps the scroll wrapper ── */}
       <DndContext
         sensors={sensors}
         collisionDetection={rectIntersection}
@@ -436,98 +421,83 @@ export default function BoardView() {
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        <div className={styles.kanban}>
-          {COLUMNS.map((col) => {
-            const colTasks = getColumnTasks(col.id);
-            const isOver = overColumnId === col.id;
+        {/* kanbanWrapper clips overflow so the page doesn't get a horizontal scrollbar */}
+        <div className={styles.kanbanWrapper}>
+          <div className={styles.kanban}>
+            {COLUMNS.map((col) => {
+              const colTasks = getColumnTasks(col.id);
+              const isOver   = overColumnId === col.id;
 
-            return (
-              <div
-                key={col.id}
-                className={`${styles.column} ${isOver ? styles.columnOver : ''}`}
-                id={`column-${col.id}`}
-              >
-                <div className={styles.columnHeader}>
-                  <span className={styles.columnTitle}>
-                    <span className={`${styles.columnDot} ${col.dot}`} />
-                    {col.title}
-                  </span>
-                  <span className={styles.columnCount}>{colTasks.length}</span>
+              return (
+                <div
+                  key={col.id}
+                  className={`${styles.column} ${isOver ? styles.columnOver : ''}`}
+                  id={`column-${col.id}`}
+                >
+                  <div className={styles.columnHeader}>
+                    <span className={styles.columnTitle}>
+                      <span className={`${styles.columnDot} ${col.dot}`} />
+                      {col.title}
+                    </span>
+                    <span className={styles.columnCount}>{colTasks.length}</span>
+                  </div>
+
+                  <SortableContext
+                    items={colTasks.map((t) => t._id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <DroppableColumnBody id={col.id} isOver={isOver}>
+                      {colTasks.length === 0 ? (
+                        <div className={`${styles.columnEmpty} ${isOver ? styles.columnEmptyOver : ''}`}>
+                          {isOver ? '✦ Drop here' : 'No tasks yet'}
+                        </div>
+                      ) : (
+                        colTasks.map((task) => (
+                          <SortableTaskCard
+                            key={task._id}
+                            task={task}
+                            onEdit={(t) => setTaskModal({ open: true, mode: 'edit',   task: t, status: t.status })}
+                            onDelete={(t) => setDeleteTarget(t)}
+                          />
+                        ))
+                      )}
+                    </DroppableColumnBody>
+                  </SortableContext>
+
+                  <button
+                    className={styles.addTaskBtn}
+                    onClick={() => setTaskModal({ open: true, mode: 'create', task: null, status: col.id })}
+                    id={`add-task-${col.id}`}
+                  >
+                    <IoAdd /> Add Task
+                  </button>
                 </div>
-
-                <SortableContext
-                  items={colTasks.map((t) => t._id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <DroppableColumnBody id={col.id} isOver={isOver}>
-                    {colTasks.length === 0 ? (
-                      <div
-                        className={`${styles.columnEmpty} ${isOver ? styles.columnEmptyOver : ''}`}
-                      >
-                        {isOver ? '✦ Drop here' : 'No tasks here yet'}
-                      </div>
-                    ) : (
-                      colTasks.map((task) => (
-                        <SortableTaskCard
-                          key={task._id}
-                          task={task}
-                          onEdit={(t) =>
-                            setTaskModal({ open: true, mode: 'edit', task: t, status: t.status })
-                          }
-                          onDelete={(t) => setDeleteTarget(t)}
-                        />
-                      ))
-                    )}
-                  </DroppableColumnBody>
-                </SortableContext>
-
-                <button
-                  className={styles.addTaskBtn}
-                  onClick={() =>
-                    setTaskModal({ open: true, mode: 'create', task: null, status: col.id })
-                  }
-                  id={`add-task-${col.id}`}
-                >
-                  <IoAdd /> Add Task
-                </button>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
-        <DragOverlay
-          dropAnimation={{
-            duration: 200,
-            easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
-          }}
-        >
+        <DragOverlay dropAnimation={{ duration: 200, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}>
           {activeTask ? <OverlayCard task={activeTask} /> : null}
         </DragOverlay>
       </DndContext>
 
-      {/* Task Modal */}
+      {/* ── Modals ── */}
       <TaskModal
         isOpen={taskModal.open}
-        onClose={() =>
-          setTaskModal({ open: false, mode: 'create', task: null, status: 'todo' })
-        }
+        onClose={() => setTaskModal({ open: false, mode: 'create', task: null, status: 'todo' })}
         onSubmit={taskModal.mode === 'edit' ? handleUpdateTask : handleCreateTask}
-        onDelete={
-          taskModal.mode === 'edit'
-            ? (id) => { setDeleteTarget(tasks.find((t) => t._id === id)); }
-            : null
-        }
+        onDelete={taskModal.mode === 'edit' ? (id) => { setDeleteTarget(tasks.find((t) => t._id === id)); } : null}
         task={taskModal.task}
         mode={taskModal.mode}
       />
 
-      {/* Delete Confirmation */}
       <ConfirmDialog
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDeleteTask}
         title="Delete Task?"
-        message={`This will permanently delete "${deleteTarget?.title}". This action cannot be undone.`}
+        message={`Permanently delete "${deleteTarget?.title}"? This cannot be undone.`}
       />
     </div>
   );

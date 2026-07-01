@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════
-   BoardView — Mobile-first, drag-and-drop safe layout
+   BoardView — Smooth drag-and-drop, mobile-first layout
    ══════════════════════════════════════════════════════ */
 
 @keyframes fadeIn {
@@ -11,12 +11,11 @@
   50%       { opacity: 0.6; }
 }
 
-/* ── Page shell ───────────────────────────────────────── */
+/* ── Page ─────────────────────────────────────────────── */
 .page {
   max-width: var(--content-max-width);
   margin: 0 auto;
   animation: fadeIn 0.3s ease;
-  /* Prevent any child from leaking horizontal scroll onto the page */
   overflow-x: hidden;
 }
 
@@ -34,7 +33,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-width: 0;         /* allow flex child to shrink below content size */
+  min-width: 0;
   flex: 1 1 auto;
 }
 
@@ -61,14 +60,13 @@
   font-weight: 600;
   color: var(--text-primary);
   letter-spacing: -0.02em;
-  /* Prevent long titles from overflowing */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
 }
 
-/* ── Controls bar ─────────────────────────────────────── */
+/* ── Controls ─────────────────────────────────────────── */
 .controls {
   display: flex;
   align-items: center;
@@ -76,9 +74,7 @@
   flex-shrink: 0;
 }
 
-.searchWrapper {
-  position: relative;
-}
+.searchWrapper { position: relative; }
 
 .searchInput {
   padding: var(--space-2) var(--space-4) var(--space-2) 36px;
@@ -87,8 +83,7 @@
   background: var(--bg-input);
   color: var(--text-primary);
   font-size: var(--font-size-sm);
-  width: 190px;
-  outline: none;
+  width: 190px; outline: none;
   transition: border-color var(--transition-hover),
               box-shadow var(--transition-hover),
               width var(--transition-hover);
@@ -101,12 +96,9 @@
 .searchInput::placeholder { color: var(--text-muted); }
 
 .searchIcon {
-  position: absolute;
-  left: 10px; top: 50%;
+  position: absolute; left: 10px; top: 50%;
   transform: translateY(-50%);
-  color: var(--text-muted);
-  font-size: 1rem;
-  pointer-events: none;
+  color: var(--text-muted); font-size: 1rem; pointer-events: none;
 }
 .searchWrapper:focus-within .searchIcon { color: var(--border-focus); }
 
@@ -117,8 +109,7 @@
   background: var(--bg-input);
   color: var(--text-primary);
   font-size: var(--font-size-sm);
-  outline: none;
-  cursor: pointer;
+  outline: none; cursor: pointer;
   transition: border-color var(--transition-hover);
 }
 .filterSelect:focus {
@@ -126,16 +117,10 @@
   box-shadow: 0 0 0 3px hsla(235, 40%, 55%, 0.14);
 }
 
-/* ── Kanban wrapper ───────────────────────────────────────
-   This wrapper handles overflow clipping.
-   The inner .kanban is the actual scrollable flex row on mobile.
-   Separating wrapper + kanban prevents the DragOverlay coordinate
-   system from being offset by a scrolled ancestor.
-   ───────────────────────────────────────────────────────── */
+/* ── Kanban wrapper — owns overflow on mobile ─────────── */
 .kanbanWrapper {
   width: 100%;
-  /* On mobile this clips the overflow so it doesn't leak to body */
-  overflow: hidden;
+  overflow: hidden; /* desktop: no overflow */
 }
 
 /* ── Kanban grid — desktop ────────────────────────────── */
@@ -144,7 +129,6 @@
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-5);
   min-height: 60vh;
-  /* No overflow here on desktop — wrapper handles it */
 }
 
 /* ── Column ───────────────────────────────────────────── */
@@ -155,35 +139,29 @@
   display: flex;
   flex-direction: column;
   min-height: 300px;
-  transition: border-color var(--transition-hover), box-shadow var(--transition-hover);
-  box-shadow: var(--shadow-sm);
-  /* Prevent column from exceeding viewport height and creating nested scroll */
   overflow: hidden;
+  transition: border-color var(--transition-hover),
+              box-shadow var(--transition-hover);
+  box-shadow: var(--shadow-sm);
 }
 
 .columnOver {
   border-color: var(--sakura);
-  box-shadow: 0 0 0 2px hsla(340, 65%, 75%, 0.2),
+  box-shadow: 0 0 0 2px hsla(340, 65%, 75%, 0.22),
               inset 0 0 28px hsla(340, 65%, 75%, 0.04);
 }
 
 .columnHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-4) var(--space-4);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-4);
   border-bottom: 1px solid var(--border-light);
   flex-shrink: 0;
 }
 
 .columnTitle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
+  display: flex; align-items: center; gap: var(--space-2);
+  font-size: var(--font-size-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.2px;
   color: var(--text-secondary);
 }
 
@@ -193,43 +171,31 @@
 .dotDone     { background: var(--status-done); }
 
 .columnCount {
-  background: var(--bg-primary);
-  padding: 2px 8px;
+  background: var(--bg-primary); padding: 2px 8px;
   border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
-  color: var(--text-muted);
-  font-weight: 600;
-  border: 1px solid var(--border-light);
+  font-size: var(--font-size-xs); color: var(--text-muted);
+  font-weight: 600; border: 1px solid var(--border-light);
 }
 
 .columnBody {
-  flex: 1;
-  padding: var(--space-3);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  overflow-y: auto;
+  flex: 1; padding: var(--space-3);
+  display: flex; flex-direction: column; gap: var(--space-3);
+  overflow-y: auto; min-height: 80px;
   transition: background var(--transition-fast);
-  /* Allow body to scroll tasks if column is height-constrained */
-  min-height: 80px;
 }
 
-.columnBodyOver { background: hsla(340, 65%, 75%, 0.04); }
+.columnBodyOver { background: hsla(340, 65%, 75%, 0.05); }
 
 .addTaskBtn {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
+  display: flex; align-items: center; justify-content: center; gap: var(--space-2);
   padding: var(--space-3);
   margin: var(--space-2) var(--space-3) var(--space-3);
   border-radius: var(--radius-md);
   color: var(--text-muted);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-size: var(--font-size-sm); font-weight: 500;
   border: 1px dashed var(--border);
-  min-height: 44px; /* touch-friendly */
+  min-height: 44px;
   transition: color var(--transition-hover), border-color var(--transition-hover),
               background var(--transition-hover);
 }
@@ -240,120 +206,121 @@
 }
 .addTaskBtn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
 
-/* ── Task Card ────────────────────────────────────────── */
+/* ── Task card ────────────────────────────────────────────
+ *
+ * Layout: flex-row with drag grip on the left.
+ * The grip is always visible on mobile, shown on hover desktop.
+ * touchAction: manipulation (set inline in JSX) so the browser
+ * handles tap/zoom but our sensor can intercept the long-press.
+ *
+ * ─────────────────────────────────────────────────────── */
 .taskCard {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-3) var(--space-3) 0;
-  /* No cursor:grab here — drag handle has it */
-  transition: box-shadow var(--transition-hover), border-color var(--transition-hover);
+  cursor: grab;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
   position: relative;
   box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-  /* touchAction must be none for dnd-kit TouchSensor to work.
-     Set on element via inline style in JSX for specificity. */
+  transition: box-shadow var(--transition-hover),
+              border-color var(--transition-hover);
+  /* Prevent text selection while dragging */
+  user-select: none;
+  -webkit-user-select: none;
 }
 .taskCard:hover {
   box-shadow: var(--shadow-card-hover);
   border-color: var(--border);
 }
+.taskCard:active { cursor: grabbing; }
 
+/* Placeholder left behind when dragging */
 .taskDragging {
-  opacity: 0.35;
+  opacity: 0.3;
   box-shadow: none;
+  border-style: dashed;
 }
 
+/* Ghost that follows the cursor */
 .taskOverlay {
-  opacity: 0.97;
   box-shadow: var(--shadow-float);
-  transform: rotate(1.5deg) scale(1.02);
+  transform: rotate(1.5deg) scale(1.03);
   cursor: grabbing;
   border-color: var(--sakura) !important;
+  opacity: 0.95;
+  /* Ensure it renders above everything */
+  z-index: 9999;
 }
 
-/* ── Drag handle ──────────────────────────────────────── */
-.dragHandle {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 28px;
+/* ── Drag grip ────────────────────────────────────────── */
+.dragGrip {
+  flex-shrink: 0;
+  width: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: grab;
   color: var(--text-muted);
+  font-size: 0.7rem;
+  letter-spacing: -2px;
   opacity: 0;
-  transition: opacity var(--transition-fast);
+  transition: opacity var(--transition-fast), background var(--transition-fast);
   border-radius: var(--radius-md) 0 0 var(--radius-md);
-  /* Ensure drag handle is wide enough for touch (44px WCAG minimum is ideal but 28px is fine with tolerance) */
-  touch-action: none;
+  border-right: 1px solid transparent;
 }
-.taskCard:hover .dragHandle { opacity: 1; }
-.dragHandle:active { cursor: grabbing; }
+.taskCard:hover .dragGrip  { opacity: 1; }
+.taskCard:active .dragGrip { cursor: grabbing; opacity: 1; }
 
-/* Always show drag handle on touch devices */
+/* Always visible on touch screens */
 @media (hover: none) {
-  .dragHandle { opacity: 0.4; }
+  .dragGrip { opacity: 0.5; background: var(--bg-elevated); }
 }
 
-.dragDots {
-  font-size: 1.1rem;
-  line-height: 1;
-  letter-spacing: -1px;
+/* ── Card content ─────────────────────────────────────── */
+.taskCardInner {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-2);
 }
 
-/* ── Task card content (offset for drag handle) ────── */
 .taskCardHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: var(--space-2);
-  gap: var(--space-2);
-  padding-left: var(--space-4); /* make room for drag handle */
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: var(--space-2); gap: var(--space-2);
 }
 
 .taskTitle {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-size: var(--font-size-sm); font-weight: 600;
   color: var(--text-primary);
-  flex: 1;
-  line-height: var(--line-height-normal);
+  flex: 1; line-height: var(--line-height-normal);
   word-break: break-word;
 }
 
-/* Action buttons — always visible on touch (no hover available) */
+/* Action buttons — always visible on touch */
 .taskActions {
-  display: flex;
-  gap: 2px;
-  flex-shrink: 0;
-  opacity: 0;
-  transition: opacity var(--transition-fast);
+  display: flex; gap: 2px; flex-shrink: 0;
+  opacity: 0; transition: opacity var(--transition-fast);
 }
 .taskCard:hover .taskActions { opacity: 1; }
-@media (hover: none) {
-  .taskActions { opacity: 1; }
-}
+@media (hover: none) { .taskActions { opacity: 1; } }
 
 .taskActionBtn {
   width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  color: var(--text-muted); font-size: 0.9rem;
   transition: all var(--transition-fast);
-  /* Critical: prevent this button from starting a drag */
+  /* Must NOT block touch events from reaching onClick */
   touch-action: auto;
+  pointer-events: all;
 }
 .taskActionBtn:hover { background: var(--bg-elevated); color: var(--text-primary); }
 .taskActionBtn.danger:hover { background: var(--priority-high-bg); color: var(--danger); }
 .taskActionBtn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
 
 .taskDesc {
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
+  font-size: var(--font-size-xs); color: var(--text-secondary);
   margin-bottom: var(--space-3);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -361,15 +328,10 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: var(--line-height-relaxed);
-  padding-left: var(--space-4);
 }
 
 .taskMeta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-  padding-left: var(--space-4);
+  display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;
 }
 
 .priorityBadge {
@@ -400,23 +362,21 @@
   display: flex; align-items: center; gap: 3px;
 }
 
-/* ── Empty column state ───────────────────────────────── */
+/* ── Empty state ──────────────────────────────────────── */
 .columnEmpty {
-  text-align: center;
-  padding: var(--space-8) var(--space-4);
-  color: var(--text-muted);
-  font-size: var(--font-size-sm);
-  font-style: italic;
-  border-radius: var(--radius-md);
-  border: 1px dashed transparent;
-  transition: all var(--transition-fast);
   flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 80px;
+  color: var(--text-muted); font-size: var(--font-size-sm); font-style: italic;
+  border-radius: var(--radius-md); border: 1px dashed transparent;
+  transition: all var(--transition-fast);
+  text-align: center; padding: var(--space-6) var(--space-4);
 }
 .columnEmptyOver {
   border: 2px dashed var(--sakura);
   color: var(--sakura-deep);
   font-style: normal; font-weight: 600;
-  background: hsla(340, 65%, 75%, 0.05);
+  background: hsla(340, 65%, 75%, 0.06);
   animation: pulse 1s ease-in-out infinite;
 }
 
@@ -424,126 +384,88 @@
    RESPONSIVE
    ════════════════════════════════════════════════════════ */
 
-/* ── Tablet / small desktop ≤ 900px ──────────────────── */
+/* ── Tablet ≤ 900px ───────────────────────────────────── */
 @media (max-width: 900px) {
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-3);
-  }
-
+  .header { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
   .titleArea { width: 100%; }
-
   .boardTitle { font-size: var(--font-size-xl); }
 
-  /* Controls: search full-width, selects beside it */
   .controls {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr auto auto;
     gap: var(--space-2);
   }
-
   .searchWrapper { width: 100%; }
   .searchInput   { width: 100%; }
   .searchInput:focus { width: 100%; }
+  .filterSelect  { font-size: 0.75rem; padding: var(--space-2); max-width: 100px; }
 
-  .filterSelect {
-    font-size: 0.75rem;
-    padding: var(--space-2) var(--space-2);
-    max-width: 100px;
-  }
-
-  /* Kanban becomes a horizontally scrollable row.
-     The kanbanWrapper clips so body has no scroll.
-     Each column snaps into view like a carousel. */
+  /* Kanban: horizontally scrollable flex row */
   .kanbanWrapper {
     overflow-x: auto;
     overflow-y: visible;
     -webkit-overflow-scrolling: touch;
-    /* Show a subtle scrollbar so user knows it scrolls */
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
-    /* Negative margin + padding trick to let box-shadows render at edges */
+    /* Bleed trick: shadow on column edges visible */
     margin: 0 calc(-1 * var(--space-4));
     padding: 0 var(--space-4) var(--space-4);
   }
-
   .kanbanWrapper::-webkit-scrollbar { height: 4px; }
   .kanbanWrapper::-webkit-scrollbar-track { background: transparent; }
   .kanbanWrapper::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: var(--radius-full);
+    background: var(--border); border-radius: var(--radius-full);
   }
 
   .kanban {
-    display: flex;
-    flex-direction: row;
+    display: flex; flex-direction: row;
     gap: var(--space-4);
     min-height: 50vh;
-    /* Width forces all columns to sit side by side */
     width: max-content;
     min-width: 100%;
-    /* No grid — flex so columns can have fixed widths */
-    scroll-snap-type: none; /* snap on wrapper instead */
   }
 
   .column {
-    /* Wide enough to be readable, narrow enough to show next column */
     flex: 0 0 min(82vw, 300px);
     min-height: 280px;
-    max-height: calc(100vh - 280px);
-    /* Column body scrolls internally — column itself doesn't overflow */
+    max-height: calc(100vh - 260px);
     overflow: hidden;
   }
 
   .columnBody {
-    /* Allow internal scroll within column on mobile */
     overflow-y: auto;
     max-height: calc(100vh - 360px);
   }
+
+  /* Grip always visible on tablet */
+  .dragGrip { opacity: 0.4; width: 24px; }
 }
 
 /* ── Mobile ≤ 600px ──────────────────────────────────── */
 @media (max-width: 600px) {
   .boardTitle { font-size: var(--font-size-lg); }
-
   .backBtn { width: 44px; height: 44px; }
 
-  /* Controls: stack search full-width, then two selects side by side */
+  /* 2-row controls: search full-width, then selects side by side */
   .controls {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
   }
+  .searchWrapper { grid-column: 1 / -1; }
+  .filterSelect  { max-width: none; width: 100%; font-size: var(--font-size-sm); padding: var(--space-2) var(--space-3); }
 
-  .searchWrapper {
-    grid-column: 1 / -1; /* search spans full width */
-  }
-
-  .filterSelect {
-    max-width: none;
-    width: 100%;
-    font-size: var(--font-size-sm);
-    padding: var(--space-2) var(--space-3);
-  }
-
-  .column {
-    flex: 0 0 min(90vw, 280px);
-  }
+  .column { flex: 0 0 min(90vw, 280px); }
+  .columnBody { max-height: calc(100vh - 380px); }
 
   /* Larger touch targets */
   .taskActionBtn { width: 36px; height: 36px; font-size: 1rem; }
-  .addTaskBtn    { min-height: 48px; font-size: var(--font-size-base); }
-  .dragHandle    { width: 32px; opacity: 0.5; }
-
-  /* Slightly more padding inside cards */
-  .taskCardHeader { padding-left: var(--space-5); }
-  .taskDesc       { padding-left: var(--space-5); }
-  .taskMeta       { padding-left: var(--space-5); }
+  .addTaskBtn    { min-height: 52px; font-size: var(--font-size-base); }
+  .dragGrip      { opacity: 0.5; width: 26px; }
 }
 
-/* ── Very small phones ≤ 380px ───────────────────────── */
+/* ── Very small ≤ 380px ──────────────────────────────── */
 @media (max-width: 380px) {
-  .column { flex: 0 0 92vw; }
-  .columnBody { max-height: calc(100vh - 400px); }
+  .column     { flex: 0 0 92vw; }
+  .columnBody { max-height: calc(100vh - 420px); }
 }

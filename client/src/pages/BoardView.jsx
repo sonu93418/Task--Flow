@@ -8,7 +8,7 @@ import {
   KeyboardSensor,
   useSensor,
   useSensors,
-  rectIntersection,
+  closestCorners,
 } from '@dnd-kit/core';
 import { useDroppable } from '@dnd-kit/core';
 import {
@@ -31,6 +31,7 @@ import Skeleton from '../components/UI/Skeleton';
 import styles from './BoardView.module.css';
 import confetti from 'canvas-confetti';
 
+/* ── Confetti ────────────────────────────────────────────────────────────── */
 const triggerConfetti = () => {
   confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
   const end = Date.now() + 1500;
@@ -42,14 +43,15 @@ const triggerConfetti = () => {
   }());
 };
 
+/* ── Constants ───────────────────────────────────────────────────────────── */
 const COLUMNS = [
-  { id: 'todo',        title: 'To Do',       dot: styles.dotTodo },
-  { id: 'in-progress', title: 'In Progress',  dot: styles.dotProgress },
-  { id: 'done',        title: 'Done',         dot: styles.dotDone },
+  { id: 'todo',        title: 'To Do',      dot: styles.dotTodo },
+  { id: 'in-progress', title: 'In Progress', dot: styles.dotProgress },
+  { id: 'done',        title: 'Done',        dot: styles.dotDone },
 ];
 const COLUMN_IDS = COLUMNS.map((c) => c.id);
 
-// ── Droppable Column Body ──────────────────────────────────────────────────────
+/* ── Droppable column body ───────────────────────────────────────────────── */
 function DroppableColumnBody({ id, isOver, children }) {
   const { setNodeRef } = useDroppable({ id });
   return (
@@ -62,15 +64,22 @@ function DroppableColumnBody({ id, isOver, children }) {
   );
 }
 
-// ── Sortable Task Card ─────────────────────────────────────────────────────────
-// KEY FIX: listeners are ONLY on the drag handle (the grip icon area),
-// NOT on the entire card. This lets edit/delete buttons receive clicks normally.
+/* ── Sortable task card ──────────────────────────────────────────────────────
+ *
+ * Design decision: the WHOLE card is the drag activator.
+ * - PointerSensor fires after 8px movement → short taps are still clicks
+ * - TouchSensor fires after 200ms hold → scrolling still works
+ * - touchAction: 'manipulation' on the card allows the browser to handle
+ *   double-tap zoom suppression while still letting our sensor intercept
+ *   the touch sequence once the delay elapses
+ * - Action buttons use onPointerDown stopPropagation so they NEVER start a drag
+ *
+ * ──────────────────────────────────────────────────────────────────────────── */
 function SortableTaskCard({ task, onEdit, onDelete }) {
   const {
     attributes,
     listeners,
     setNodeRef,
-    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
@@ -79,16 +88,9 @@ function SortableTaskCard({ task, onEdit, onDelete }) {
     data: { type: 'task', status: task.status },
   });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    // Prevent the browser's default touch behaviour (scroll) on the card
-    // so the TouchSensor can intercept the touch events properly
-    touchAction: 'none',
-  };
-
   const isOverdue =
     task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'done';
+
   const formatDate = (d) =>
     new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
@@ -99,68 +101,81 @@ function SortableTaskCard({ task, onEdit, onDelete }) {
   }[task.priority] || styles.priorityMedium;
 
   return (
-    // setNodeRef on wrapper — dnd needs to measure the element
-    // attributes (aria) on wrapper — accessibility
-    // listeners go on the DRAG HANDLE only (see below)
     <div
       ref={setNodeRef}
-      style={style}
+      /* Spread listeners on the whole card so the entire surface is draggable.
+         The PointerSensor distance:8 + TouchSensor delay:200 constraints mean
+         short taps/clicks still reach child buttons. */
+      {...listeners}
       {...attributes}
       className={`${styles.taskCard} ${isDragging ? styles.taskDragging : ''}`}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition: transition ?? undefined,
+        /* GPU-composite the card during drag for smooth 60fps movement */
+        willChange: isDragging ? 'transform' : undefined,
+        /* Allow tap/click events through; prevent only multi-touch/scroll
+           gestures from hijacking the drag sequence */
+        touchAction: 'manipulation',
+      }}
     >
-      {/* Drag handle — only this area starts a drag */}
-      <div
-        ref={setActivatorNodeRef}
-        {...listeners}
-        className={styles.dragHandle}
-        aria-label="Drag to reorder"
-      >
-        <span className={styles.dragDots}>⠿</span>
+      {/* Drag affordance indicator — purely visual, not interactive */}
+      <div className={styles.dragGrip} aria-hidden="true">
+        <span>⋮⋮</span>
       </div>
 
-      <div className={styles.taskCardHeader}>
-        <span className={styles.taskTitle}>{task.title}</span>
-        {/* These buttons are OUTSIDE listeners so they work normally on touch */}
-        <div className={styles.taskActions}>
-          <button
-            className={styles.taskActionBtn}
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => { e.stopPropagation(); onEdit(task); }}
-            aria-label="Edit task"
-          >
-            <IoCreateOutline />
-          </button>
-          <button
-            className={`${styles.taskActionBtn} ${styles.danger}`}
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => { e.stopPropagation(); onDelete(task); }}
-            aria-label="Delete task"
-          >
-            <IoTrashOutline />
-          </button>
+      <div className={styles.taskCardInner}>
+        <div className={styles.taskCardHeader}>
+          <span className={styles.taskTitle}>{task.title}</span>
+          <div className={styles.taskActions}>
+            {/* stopPropagation on pointerdown prevents the sensor from
+                treating the button press as the start of a drag */}
+            <button
+              className={styles.taskActionBtn}
+              onPointerDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); onEdit(task); }}
+              aria-label="Edit task"
+            >
+              <IoCreateOutline />
+            </button>
+            <button
+              className={`${styles.taskActionBtn} ${styles.danger}`}
+              onPointerDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); onDelete(task); }}
+              aria-label="Delete task"
+            >
+              <IoTrashOutline />
+            </button>
+          </div>
         </div>
-      </div>
 
-      {task.description && <p className={styles.taskDesc}>{task.description}</p>}
+        {task.description && (
+          <p className={styles.taskDesc}>{task.description}</p>
+        )}
 
-      <div className={styles.taskMeta}>
-        <span className={`${styles.priorityBadge} ${priorityClass}`}>{task.priority}</span>
-        {task.dueDate && (
-          <span className={`${styles.dueBadge} ${isOverdue ? styles.dueOverdue : ''}`}>
-            <IoCalendarOutline /> {formatDate(task.dueDate)} {isOverdue && '⚠'}
+        <div className={styles.taskMeta}>
+          <span className={`${styles.priorityBadge} ${priorityClass}`}>
+            {task.priority}
           </span>
-        )}
-        {task.estimatedEffort && (
-          <span className={styles.effortBadge}>
-            <IoTimeOutline /> {task.estimatedEffort}
-          </span>
-        )}
+          {task.dueDate && (
+            <span className={`${styles.dueBadge} ${isOverdue ? styles.dueOverdue : ''}`}>
+              <IoCalendarOutline /> {formatDate(task.dueDate)} {isOverdue && '⚠'}
+            </span>
+          )}
+          {task.estimatedEffort && (
+            <span className={styles.effortBadge}>
+              <IoTimeOutline /> {task.estimatedEffort}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-// ── Drag Overlay Card (ghost while dragging) ───────────────────────────────────
+/* ── Overlay ghost card (rendered at cursor level during drag) ───────────── */
 function OverlayCard({ task }) {
   const priorityClass = {
     high:   styles.priorityHigh,
@@ -170,49 +185,61 @@ function OverlayCard({ task }) {
 
   return (
     <div className={`${styles.taskCard} ${styles.taskOverlay}`}>
-      <div className={styles.taskCardHeader}>
-        <span className={styles.taskTitle}>{task.title}</span>
-      </div>
-      {task.description && <p className={styles.taskDesc}>{task.description}</p>}
-      <div className={styles.taskMeta}>
-        <span className={`${styles.priorityBadge} ${priorityClass}`}>{task.priority}</span>
+      <div className={styles.dragGrip} aria-hidden="true"><span>⋮⋮</span></div>
+      <div className={styles.taskCardInner}>
+        <div className={styles.taskCardHeader}>
+          <span className={styles.taskTitle}>{task.title}</span>
+        </div>
+        {task.description && <p className={styles.taskDesc}>{task.description}</p>}
+        <div className={styles.taskMeta}>
+          <span className={`${styles.priorityBadge} ${priorityClass}`}>{task.priority}</span>
+        </div>
       </div>
     </div>
   );
 }
 
-// ── Main Board View ────────────────────────────────────────────────────────────
+/* ── Main component ──────────────────────────────────────────────────────── */
 export default function BoardView() {
   const { id: boardId } = useParams();
   const navigate        = useNavigate();
   const { fetchBoards } = useOutletContext();
   const toast           = useToast();
 
-  const [board,         setBoard]         = useState(null);
-  const [tasks,         setTasks]         = useState([]);
-  const [loading,       setLoading]       = useState(true);
-  const [search,        setSearch]        = useState('');
-  const [filterPriority,setFilterPriority]= useState('');
-  const [sortBy,        setSortBy]        = useState('');
-  const [taskModal,     setTaskModal]     = useState({ open: false, mode: 'create', task: null, status: 'todo' });
+  const [board,          setBoard]          = useState(null);
+  const [tasks,          setTasks]          = useState([]);
+  const [loading,        setLoading]        = useState(true);
+  const [search,         setSearch]         = useState('');
+  const [filterPriority, setFilterPriority] = useState('');
+  const [sortBy,         setSortBy]         = useState('');
+  const [taskModal,      setTaskModal]      = useState({
+    open: false, mode: 'create', task: null, status: 'todo',
+  });
   const [deleteTarget,  setDeleteTarget]  = useState(null);
   const [activeTask,    setActiveTask]    = useState(null);
   const [overColumnId,  setOverColumnId]  = useState(null);
 
-  const tasksSnapshot = useRef([]);
+  /* Keep a ref to latest tasks so drag handlers never read stale state */
+  const tasksRef     = useRef(tasks);
+  const snapshotRef  = useRef([]);
+  useEffect(() => { tasksRef.current = tasks; }, [tasks]);
 
-  // Sensors:
-  // PointerSensor  — mouse + stylus, activates after 8px movement
-  // TouchSensor    — finger, 250ms hold + 5px tolerance (prevents scroll conflicts)
-  // KeyboardSensor — accessibility
+  /* ── Sensors ─────────────────────────────────────────────────────────────
+   * PointerSensor: mouse / stylus — activates after 8px movement.
+   *   This means a click (< 8px) is never treated as drag.
+   * TouchSensor: finger — activates after 200ms press with max 8px drift.
+   *   Short taps trigger the click handler normally.
+   *   Long press (≥200ms) starts the drag.
+   * KeyboardSensor: accessibility.
+   * ───────────────────────────────────────────────────────────────────────── */
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 8 },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 250,
-        tolerance: 5,
+        delay: 200,
+        tolerance: 8,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -220,6 +247,7 @@ export default function BoardView() {
     })
   );
 
+  /* ── Data fetching ─────────────────────────────────────────────────────── */
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -239,12 +267,14 @@ export default function BoardView() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  /* ── Filtered / sorted task list ──────────────────────────────────────── */
   const filteredTasks = useMemo(() => {
     let result = [...tasks];
     if (search) {
       const s = search.toLowerCase();
       result = result.filter(
-        (t) => t.title.toLowerCase().includes(s) || t.description?.toLowerCase().includes(s)
+        (t) => t.title.toLowerCase().includes(s) ||
+               t.description?.toLowerCase().includes(s)
       );
     }
     if (filterPriority) result = result.filter((t) => t.priority === filterPriority);
@@ -259,7 +289,7 @@ export default function BoardView() {
 
   const getColumnTasks = (status) => filteredTasks.filter((t) => t.status === status);
 
-  // ── CRUD ──────────────────────────────────────────────────────────────────
+  /* ── CRUD ────────────────────────────────────────────────────────────────── */
   const handleCreateTask = async (data) => {
     const res = await createTask(boardId, { ...data, status: taskModal.status });
     setTasks((prev) => [...prev, res.data.data]);
@@ -270,12 +300,10 @@ export default function BoardView() {
   const handleUpdateTask = async (data) => {
     const originalTask = taskModal.task;
     const res = await updateTask(boardId, taskModal.task._id, data);
-    setTasks((prev) => prev.map((t) => (t._id === taskModal.task._id ? res.data.data : t)));
+    setTasks((prev) => prev.map((t) => t._id === taskModal.task._id ? res.data.data : t));
     toast.success('Task updated', `"${data.title}" saved`);
     fetchBoards();
-    if (originalTask && originalTask.status !== 'done' && data.status === 'done') {
-      triggerConfetti();
-    }
+    if (originalTask?.status !== 'done' && data.status === 'done') triggerConfetti();
   };
 
   const handleDeleteTask = async () => {
@@ -291,71 +319,92 @@ export default function BoardView() {
     setDeleteTarget(null);
   };
 
-  // ── Drag helpers ──────────────────────────────────────────────────────────
-  const resolveTargetColumn = (over, currentTasks) => {
+  /* ── Drag helpers ─────────────────────────────────────────────────────────
+   * All handlers read from tasksRef.current (always fresh) instead of
+   * the stale `tasks` closure value.
+   * ───────────────────────────────────────────────────────────────────────── */
+  const resolveTargetColumn = (over) => {
     if (!over) return null;
     if (COLUMN_IDS.includes(over.id)) return over.id;
-    const overTask = currentTasks.find((t) => t._id === over.id);
+    const overTask = tasksRef.current.find((t) => t._id === over.id);
     return overTask ? overTask.status : null;
   };
 
   const handleDragStart = ({ active }) => {
-    const task = tasks.find((t) => t._id === active.id);
+    const task = tasksRef.current.find((t) => t._id === active.id);
     if (!task) return;
-    tasksSnapshot.current = tasks;
+    /* Snapshot before any optimistic updates */
+    snapshotRef.current = [...tasksRef.current];
     setActiveTask(task);
   };
 
   const handleDragOver = ({ active, over }) => {
-    const targetColumn = resolveTargetColumn(over, tasks);
+    const targetColumn = resolveTargetColumn(over);
     setOverColumnId(targetColumn);
-    if (!targetColumn || !activeTask) return;
-    if (activeTask.status === targetColumn) return;
+
+    if (!targetColumn) return;
+
+    /* Read from ref — no stale closure */
+    const currentStatus = tasksRef.current.find((t) => t._id === active.id)?.status;
+    if (!currentStatus || currentStatus === targetColumn) return;
+
+    /* Optimistic cross-column move */
     setTasks((prev) =>
       prev.map((t) => t._id === active.id ? { ...t, status: targetColumn } : t)
     );
-    setActiveTask((prev) => ({ ...prev, status: targetColumn }));
+    setActiveTask((prev) => prev ? { ...prev, status: targetColumn } : prev);
   };
 
   const handleDragEnd = async ({ active, over }) => {
-    const task = tasksSnapshot.current.find((t) => t._id === active.id);
+    const originalTask = snapshotRef.current.find((t) => t._id === active.id);
     setActiveTask(null);
     setOverColumnId(null);
 
-    if (!over || !task) { setTasks(tasksSnapshot.current); return; }
+    if (!over || !originalTask) {
+      setTasks(snapshotRef.current);
+      return;
+    }
 
-    const targetColumn = resolveTargetColumn(over, tasks);
-    if (!targetColumn) { setTasks(tasksSnapshot.current); return; }
+    const targetColumn = resolveTargetColumn(over);
+    if (!targetColumn) {
+      setTasks(snapshotRef.current);
+      return;
+    }
 
-    const colTasks      = tasks.filter((t) => t.status === targetColumn);
-    const posIdx        = colTasks.findIndex((t) => t._id === active.id);
+    /* Position within the destination column */
+    const colTasks       = tasksRef.current.filter((t) => t.status === targetColumn);
+    const posIdx         = colTasks.findIndex((t) => t._id === active.id);
     const targetPosition = posIdx >= 0 ? posIdx : colTasks.length;
 
-    if (task.status === targetColumn && task.position === targetPosition) return;
+    /* Nothing actually changed */
+    if (originalTask.status === targetColumn && originalTask.position === targetPosition) return;
 
     try {
       await moveTask(boardId, active.id, { status: targetColumn, position: targetPosition });
+      /* Refresh from server for authoritative order */
       const res = await getTasks(boardId);
       setTasks(res.data.data);
       fetchBoards();
-      if (task.status !== 'done' && targetColumn === 'done') triggerConfetti();
+      if (originalTask.status !== 'done' && targetColumn === 'done') triggerConfetti();
     } catch {
       toast.error('Error', 'Failed to move task');
-      setTasks(tasksSnapshot.current);
+      setTasks(snapshotRef.current);
     }
   };
 
   const handleDragCancel = () => {
     setActiveTask(null);
     setOverColumnId(null);
-    setTasks(tasksSnapshot.current);
+    setTasks(snapshotRef.current);
   };
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  /* ── Render ──────────────────────────────────────────────────────────── */
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className={styles.header}><Skeleton variant="title" width="250px" /></div>
+        <div className={styles.header}>
+          <Skeleton variant="title" width="250px" />
+        </div>
         <div className={styles.kanbanWrapper}>
           <div className={styles.kanban}>
             {[1, 2, 3].map((i) => <Skeleton key={i} variant="card" height="400px" />)}
@@ -367,7 +416,7 @@ export default function BoardView() {
 
   return (
     <div className={styles.page}>
-      {/* ── Header ── */}
+      {/* Header */}
       <div className={styles.header}>
         <div className={styles.titleArea}>
           <button className={styles.backBtn} onClick={() => navigate('/')} aria-label="Back">
@@ -412,16 +461,15 @@ export default function BoardView() {
         </div>
       </div>
 
-      {/* ── Kanban — DndContext wraps the scroll wrapper ── */}
+      {/* Kanban board */}
       <DndContext
         sensors={sensors}
-        collisionDetection={rectIntersection}
+        collisionDetection={closestCorners}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        {/* kanbanWrapper clips overflow so the page doesn't get a horizontal scrollbar */}
         <div className={styles.kanbanWrapper}>
           <div className={styles.kanban}>
             {COLUMNS.map((col) => {
@@ -456,7 +504,9 @@ export default function BoardView() {
                           <SortableTaskCard
                             key={task._id}
                             task={task}
-                            onEdit={(t) => setTaskModal({ open: true, mode: 'edit',   task: t, status: t.status })}
+                            onEdit={(t) =>
+                              setTaskModal({ open: true, mode: 'edit', task: t, status: t.status })
+                            }
                             onDelete={(t) => setDeleteTarget(t)}
                           />
                         ))
@@ -466,7 +516,9 @@ export default function BoardView() {
 
                   <button
                     className={styles.addTaskBtn}
-                    onClick={() => setTaskModal({ open: true, mode: 'create', task: null, status: col.id })}
+                    onClick={() =>
+                      setTaskModal({ open: true, mode: 'create', task: null, status: col.id })
+                    }
                     id={`add-task-${col.id}`}
                   >
                     <IoAdd /> Add Task
@@ -477,17 +529,28 @@ export default function BoardView() {
           </div>
         </div>
 
-        <DragOverlay dropAnimation={{ duration: 200, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}>
+        <DragOverlay
+          dropAnimation={{
+            duration: 180,
+            easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+          }}
+        >
           {activeTask ? <OverlayCard task={activeTask} /> : null}
         </DragOverlay>
       </DndContext>
 
-      {/* ── Modals ── */}
+      {/* Modals */}
       <TaskModal
         isOpen={taskModal.open}
-        onClose={() => setTaskModal({ open: false, mode: 'create', task: null, status: 'todo' })}
+        onClose={() =>
+          setTaskModal({ open: false, mode: 'create', task: null, status: 'todo' })
+        }
         onSubmit={taskModal.mode === 'edit' ? handleUpdateTask : handleCreateTask}
-        onDelete={taskModal.mode === 'edit' ? (id) => { setDeleteTarget(tasks.find((t) => t._id === id)); } : null}
+        onDelete={
+          taskModal.mode === 'edit'
+            ? (id) => { setDeleteTarget(tasks.find((t) => t._id === id)); }
+            : null
+        }
         task={taskModal.task}
         mode={taskModal.mode}
       />

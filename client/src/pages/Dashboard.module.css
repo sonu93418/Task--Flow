@@ -398,3 +398,20 @@
   .boardCard { padding: 1.25rem; }
 }
 
+
+/* ─── RESPONSIVE OVERRIDES ─── */
+@media (max-width: 900px) {
+  .boardGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .createBtn { width: 100%; justify-content: center; }
+  .statNumber { font-size: 1.8rem; }
+  .chartsSection { grid-template-columns: 1fr; }
+
+  /* Always show board action buttons on touch — no hover on mobile */
+  .boardActions { opacity: 1; }
+
+  /* Larger touch targets */
+  .boardActionBtn { width: 36px; height: 36px; font-size: 1rem; }
+}

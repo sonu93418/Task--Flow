@@ -4,6 +4,7 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   rectIntersection,
@@ -203,7 +204,13 @@ export default function BoardView() {
   const tasksSnapshot = useRef([]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,        // ms hold before drag starts — prevents accidental drags on scroll
+        tolerance: 8,      // px movement allowed during delay
+      },
+    })
   );
 
   const fetchData = useCallback(async () => {
